@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import LZString from 'lz-string';
+import {Card, CardBody} from "@nextui-org/react";
 
 const PlayerStatsFilter = () => {
   const apiKeys = [
@@ -186,13 +187,13 @@ const PlayerStatsFilter = () => {
 
       <h3>Top 20 Players</h3>
       {playersStats.length > 0 ? (
-        <ul>
+        <Card className='bg-red'>
           {playersStats.map((player, index) => (
-            <li key={index}>
+            <CardBody key={index}>
               {player.name}: {player.criteriaMet}/{player.totalGames} games
-            </li>
+            </CardBody>
           ))}
-        </ul>
+        </Card>
       ) : (
         <p>No players found.</p>
       )}

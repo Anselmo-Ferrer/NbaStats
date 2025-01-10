@@ -4,7 +4,7 @@ import TeamsDetail from "./times.jsx"
 function App() {
 
   return (
-    <div>
+    <div className="bg-red-900">
       < PlayerStatsFilter />
       {/* <TeamsDetail /> */}
     </div>
