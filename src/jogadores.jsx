@@ -113,38 +113,68 @@ const PlayerStatsFilter = () => {
       setError('Nenhum dado encontrado no Local Storage. Busque os dados primeiro.');
       return;
     }
-
+  
     const rawData = JSON.parse(LZString.decompress(compressedData));
     if (!rawData || rawData.length === 0) {
       setError('Falha ao descomprimir ou nenhum dado encontrado.');
       return;
     }
-
+  
     const playerStats = {};
-
+  
     rawData.forEach((player) => {
       const playerId = player.player.id;
       const playerName = `${player.player.firstname} ${player.player.lastname}`;
-
+      const teamName = player.team ? player.team.name : 'Unknown Team';
+  
       if (!playerStats[playerId]) {
-        playerStats[playerId] = { name: playerName, totalGames: 0, criteriaMet: 0 };
+        playerStats[playerId] = {
+          name: playerName,
+          team: teamName,
+          totalGames: 0,
+          criteriaMet: 0,
+          maxGamesWithoutCriteria: 0, // Armazena o máximo de jogos consecutivos sem bater critérios
+          currentGamesWithoutCriteria: 0, // Contador temporário de jogos consecutivos
+        };
       }
-
+  
       playerStats[playerId].totalGames++;
-
+  
       if (
         player.points >= points &&
         player.assists >= assists &&
         player.totReb >= rebounds
       ) {
         playerStats[playerId].criteriaMet++;
+  
+        // Reseta o contador de jogos consecutivos sem atender aos critérios
+        playerStats[playerId].maxGamesWithoutCriteria = Math.max(
+          playerStats[playerId].maxGamesWithoutCriteria,
+          playerStats[playerId].currentGamesWithoutCriteria
+        );
+        playerStats[playerId].currentGamesWithoutCriteria = 0;
+      } else {
+        // Incrementa o contador de jogos consecutivos sem atender aos critérios
+        playerStats[playerId].currentGamesWithoutCriteria++;
       }
     });
-
+  
+    // Atualiza o valor máximo após processar todos os jogos
+    Object.values(playerStats).forEach((player) => {
+      player.maxGamesWithoutCriteria = Math.max(
+        player.maxGamesWithoutCriteria,
+        player.currentGamesWithoutCriteria
+      );
+    });
+  
     const filteredPlayers = Object.values(playerStats)
       .filter((player) => player.criteriaMet > 0)
-      .sort((a, b) => b.criteriaMet - a.criteriaMet);
-
+      .sort((a, b) => {
+        const percentageA = (a.criteriaMet / a.totalGames) * 100;
+        const percentageB = (b.criteriaMet / b.totalGames) * 100;
+        return percentageB - percentageA;
+      });
+  
     setPlayersStats(filteredPlayers.slice(0, 20));
   };
 
@@ -155,26 +185,28 @@ const PlayerStatsFilter = () => {
   };
 
   return (
-    <div>
-      <h2>Player Stats Filter</h2>
-      <label>
-        Points:
-        <input type="number" value={points} onChange={(e) => setPoints(Number(e.target.value))} />
-      </label>
-      <label>
-        Assists:
-        <input type="number" value={assists} onChange={(e) => setAssists(Number(e.target.value))} />
-      </label>
-      <label>
-        Rebounds:
-        <input type="number" value={rebounds} onChange={(e) => setRebounds(Number(e.target.value))} />
-      </label>
-      <button onClick={fetchAndStoreData} disabled={loading}>
-        {loading ? 'Fetching...' : 'Fetch and Save Data'}
-      </button>
-      <button onClick={applyFilters} disabled={loading}>
-        Apply Filters
-      </button>
+    <div className='py-10 flex'>
+      <div className='flex flex-col w-[20%]'>
+        <h2>Player Stats Filter</h2>
+        <label>
+          Points:
+          <input type="number" value={points} onChange={(e) => setPoints(Number(e.target.value))} />
+        </label>
+        <label>
+          Assists:
+          <input type="number" value={assists} onChange={(e) => setAssists(Number(e.target.value))} />
+        </label>
+        <label>
+          Rebounds:
+          <input type="number" value={rebounds} onChange={(e) => setRebounds(Number(e.target.value))} />
+        </label>
+        <button onClick={fetchAndStoreData} disabled={loading}>
+          {loading ? 'Fetching...' : 'Fetch and Save Data'}
+        </button>
+        <button onClick={applyFilters} disabled={loading}>
+          Apply Filters
+        </button>
+      </div>
 
       {error && <div style={{ color: 'red' }}>{error}</div>}
 
@@ -185,18 +217,28 @@ const PlayerStatsFilter = () => {
         </div>
       )}
 
-      <h3>Top 20 Players</h3>
-      {playersStats.length > 0 ? (
-        <Card className='bg-red'>
-          {playersStats.map((player, index) => (
-            <CardBody key={index}>
-              {player.name}: {player.criteriaMet}/{player.totalGames} games
+      <div className='w-[80%]'>
+        <h3>Top 20 Players</h3>
+        {playersStats.length > 0 ? (
+          <Card className="py-10 flex flex-col">
+            {playersStats.map((player, index) => (
+              <CardBody
+              key={index}
+              className="border-none bg-background/60 dark:bg-default-100/50 mb-4 p-4 rounded-md"
+              isBlurred
+              shadow="sm"
+            >
+              {player.name} ({player.team}): {player.criteriaMet}/{player.totalGames} - 
+              {((player.criteriaMet * 100) / player.totalGames).toFixed(0)}% 
+              <br />
+              Máximo de jogos sem critérios: {player.maxGamesWithoutCriteria}
             </CardBody>
-          ))}
-        </Card>
-      ) : (
-        <p>No players found.</p>
-      )}
+            ))} 
+          </Card>
+        ) : (
+          <p>No players found.</p>
+        )}
+      </div>
     </div>
   );
 };
