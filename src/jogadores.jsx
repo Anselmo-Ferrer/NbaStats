@@ -133,33 +133,36 @@ const PlayerStatsFilter = () => {
           team: teamName,
           totalGames: 0,
           criteriaMet: 0,
-          maxGamesWithoutCriteria: 0, // Armazena o máximo de jogos consecutivos sem bater critérios
-          currentGamesWithoutCriteria: 0, // Contador temporário de jogos consecutivos
+          maxGamesWithoutCriteria: 0,
+          currentGamesWithoutCriteria: 0,
+          last10Games: [], // Array para armazenar os resultados dos últimos 10 jogos
         };
       }
   
       playerStats[playerId].totalGames++;
   
-      if (
+      const metCriteria =
         player.points >= points &&
         player.assists >= assists &&
-        player.totReb >= rebounds
-      ) {
-        playerStats[playerId].criteriaMet++;
+        player.totReb >= rebounds;
   
-        // Reseta o contador de jogos consecutivos sem atender aos critérios
+      if (metCriteria) {
+        playerStats[playerId].criteriaMet++;
         playerStats[playerId].maxGamesWithoutCriteria = Math.max(
           playerStats[playerId].maxGamesWithoutCriteria,
           playerStats[playerId].currentGamesWithoutCriteria
         );
         playerStats[playerId].currentGamesWithoutCriteria = 0;
+        playerStats[playerId].last10Games.push("V");
       } else {
-        // Incrementa o contador de jogos consecutivos sem atender aos critérios
         playerStats[playerId].currentGamesWithoutCriteria++;
+        playerStats[playerId].last10Games.push("F");
       }
+  
+      // Mantém apenas os últimos 10 jogos
+      playerStats[playerId].last10Games = playerStats[playerId].last10Games.slice(-10);
     });
   
-    // Atualiza o valor máximo após processar todos os jogos
     Object.values(playerStats).forEach((player) => {
       player.maxGamesWithoutCriteria = Math.max(
         player.maxGamesWithoutCriteria,
@@ -229,9 +232,11 @@ const PlayerStatsFilter = () => {
               shadow="sm"
             >
               {player.name} ({player.team}): {player.criteriaMet}/{player.totalGames} - 
-              {((player.criteriaMet * 100) / player.totalGames).toFixed(0)}% 
+              {((player.criteriaMet * 100) / player.totalGames).toFixed(0)}%
               <br />
               Máximo de jogos sem critérios: {player.maxGamesWithoutCriteria}
+              <br />
+              Últimos 10 jogos: {player.last10Games.join("/")}
             </CardBody>
             ))} 
           </Card>
