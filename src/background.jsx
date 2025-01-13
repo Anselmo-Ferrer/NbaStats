@@ -39,7 +39,7 @@ const GradientBlob = ({ position, wrapperRotation = "", rotation, blur }) => (
           borderRadius: "180.32px / 264.61px",
           transform: `rotate(${rotation})`,
           filter: `blur(${blur})`,
-          background: "linear-gradient(to bottom, rgb(250, 3, 245), rgb(170, 156, 255))",
+          background: "linear-gradient(to bottom, rgb(255, 164, 9), rgb(255, 134, 4), rgb(255, 102, 0))",
         }}
       />
     </div>

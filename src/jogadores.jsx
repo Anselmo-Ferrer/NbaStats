@@ -222,7 +222,7 @@ const PlayerStatsFilter = () => {
           <Input label="Pontos" labelPlacement="inside" type="number" value={points} onChange={(e) => setPoints(Number(e.target.value))}/>
           <Input label="Assistencias" labelPlacement="inside" type="number" value={assists} onChange={(e) => setAssists(Number(e.target.value))} />
           <Input label="Rebotes" labelPlacement="inside" type="number" value={rebounds} onChange={(e) => setRebounds(Number(e.target.value))} />
-        <Button color='primary' onPress={applyFilters} disabled={loading}>
+        <Button className='bg-[#FF6600]' onPress={applyFilters} disabled={loading}>
           Filtrar
         </Button>
         <Button color='transparent' onPress={fetchAndStoreData} disabled={loading}>

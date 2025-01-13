@@ -1,3 +1,5 @@
+import { ScrollShadow } from '@nextui-org/react';
+import { Star } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -6,7 +8,15 @@ const TeamsDetail = () => {
   const [teams, setTeams] = useState([]);
   const [id, setId] = useState(paramId || 802); // Default to 802 if paramId is undefined
   const [selectedTeam, setSelectedTeam] = useState(paramSelectedTeam || 1); // Default to 1 if paramSelectedTeam is undefined
-  const [totalWins, setTotalWins] = useState(0); // Estado para armazenar o total de vitórias
+
+  const columns = [
+    { label: "Position", justifyItems: "justify-items-start", columnSpan: "col-span-1" },
+    { label: "Teams", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
+    { label: "Conference", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
+    { label: "Wins", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
+    { label: "Loses", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
+    { label: "Last Matches", justifyItems: "justify-items-center", columnSpan: "col-span-2" },
+  ];
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -36,7 +46,6 @@ const TeamsDetail = () => {
 
           // Calcula o total de vitórias
           const total = sortedTeams.reduce((sum, team) => sum + (team.win?.total || 0), 0);
-          setTotalWins(total);
         } else {
           console.error('No data found');
           setTeams([]);
@@ -54,22 +63,88 @@ const TeamsDetail = () => {
   }
 
   return (
-    <div>
-      <h1>Total Wins: {totalWins}</h1> {/* Exibe o total de vitórias */}
-      {teams.map((team, index) => {
-        const wins = team.win?.total || 'N/A';
-        const losses = team.loss?.total || 'N/A';
+    <ScrollShadow className="w-[100%] h-screen overflow-auto py-10" >
+      <div className="flex flex-col" style={{backgroundColor: "rgba(27, 27, 27, 0.6)", backdropFilter: "blur(20px)", borderRadius: "12px", padding: "32px"}}>
+        {teams.length > 0 ? (
+          <div>
 
-        return (
-          <div key={index} className="team-box">
-            <h2>{`#${index + 1} - ${team.team?.name || 'N/A'}`}</h2>
-            <p>{`Conference: ${team.conference?.name || 'N/A'}`}</p>
-            <p>{`Wins: ${wins}`}</p>
-            <p>{`Losses: ${losses}`}</p>
+            <div style={{ marginBottom: "20px" }} className="grid grid-cols-7">
+              {columns.map((column, index) => (
+                <div
+                  className={`grid ${column.columnSpan} ${column.justifyItems}`}
+                  key={index}
+                  style={{
+                    color: "#868686",
+                    fontSize: "0.875rem",
+                    fontWeight: "500",
+                  }}
+                >
+                  {column.label}
+                </div>
+              ))}
+            </div>
+
+
+          {teams.map((team, index) => (
+            <div className='mb-4' key={index}>
+            {/* Column Headers */}
+
+
+          {/* Content Row */}
+          <div style={{ alignItems: "center", justifyContent: "space-between",}} className="grid grid-cols-7">
+            {/* Player Info */}
+            <div>
+              <div style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
+                {index + 1}
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="grid justify-items-center">
+              <div style={{ color: "white", fontWeight: "600", fontSize: "0.95rem" }}>
+              {team.team?.name}
+              </div>
+            </div>
+
+            {/* Match Count */}
+            <div className="grid justify-items-center">
+              <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
+                {team.conference?.name}
+              </span>
+            </div>
+
+            <div className="grid justify-items-center">
+              <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
+                {team.win?.total}
+              </span>
+            </div>
+
+            <div className="grid justify-items-center">
+              <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
+              {team.loss?.total}
+              </span>
+            </div>
+
+            {/* Match Indicators */}
+            <div className="col-span-2 grid justify-items-center grid-flow-col">
+              abcdef
+            </div>
+
           </div>
-        );
-      })}
-    </div>
+
+
+
+              
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className='w-full h-[300px] flex justify-center items-center'>
+            <p className='text-4xl'>Busque por criterios.</p>
+          </div>
+        )}
+      </div>
+      </ScrollShadow>
   );
 };
 
