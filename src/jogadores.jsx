@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import LZString from 'lz-string';
-import { Button, Card, CardBody, Input } from "@nextui-org/react";
+import { Button, Card, CardBody, Input, ScrollShadow } from "@nextui-org/react";
+import { Star } from 'lucide-react';
+
+const columns = [
+  { label: "Name", justifyItems: "justify-items-start", columnSpan: "col-span-1" },
+  { label: "Criterios", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
+  { label: "Max Matches", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
+  { label: "Last Matches", justifyItems: "justify-items-center", columnSpan: "col-span-2" },
+];
 
 const PlayerStatsFilter = () => {
   const apiKeys = [
@@ -198,95 +206,114 @@ const PlayerStatsFilter = () => {
 
   // Função para renderizar bolinhas verdes (Vitória) e vermelhas (Derrota)
   const renderGameResult = (result) => {
-    const color = result === "V" ? "green" : "red";
+    const color = result === "V" ? "rgb(34, 197, 94)" : "#C62D2D";
     return (
       <span 
         className='rounded-full mr-2 flex items-center justify-center'
-        style={{
-          backgroundColor: color, 
-          width: '20px', 
-          height: '20px', 
-          opacity: '0.4'
-        }} 
+        style={{ width: "25px", height: "25px", borderRadius: "50%",backgroundColor: color}}
       >
       </span>
     );
   };
 
   return (
-    <div className='py-10 flex'>
-      <div className='flex flex-col w-[20%]'>
-        <h2>Player Stats Filter</h2>
+    <div className='py-10 flex gap-4'>
+      <div className='flex flex-col w-[20%] gap-4'>
           <Input label="Pontos" labelPlacement="inside" type="number" value={points} onChange={(e) => setPoints(Number(e.target.value))}/>
-          <Input label="Pontos" labelPlacement="inside" type="number" value={assists} onChange={(e) => setAssists(Number(e.target.value))} />
-          <Input label="Pontos" labelPlacement="inside" type="number" value={rebounds} onChange={(e) => setRebounds(Number(e.target.value))} />
-        <Button color='primary' onClick={fetchAndStoreData} disabled={loading}>
-          {loading ? 'Fetching...' : 'Fetch and Save Data'}
+          <Input label="Assistencias" labelPlacement="inside" type="number" value={assists} onChange={(e) => setAssists(Number(e.target.value))} />
+          <Input label="Rebotes" labelPlacement="inside" type="number" value={rebounds} onChange={(e) => setRebounds(Number(e.target.value))} />
+        <Button color='primary' onPress={applyFilters} disabled={loading}>
+          Filtrar
         </Button>
-        <Button color='primary' onClick={applyFilters} disabled={loading}>
-          Apply Filters
+        <Button color='transparent' onPress={fetchAndStoreData} disabled={loading}>
+          {loading ? 'Fetching...' : 'Atualizar'}
         </Button>
+
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+
+        {loading && (
+          <div>
+            <p>Progresso: {gamesFetched} games fetched</p>
+            <p>Tempo estimado: {formatTime(timeRemaining)}</p>
+          </div>
+        )}
       </div>
 
-      {error && <div style={{ color: 'red' }}>{error}</div>}
 
-      {loading && (
-        <div>
-          <p>Progress: {gamesFetched} games fetched</p>
-          <p>Estimated Time Remaining: {formatTime(timeRemaining)}</p>
-        </div>
-      )}
-
-      <div className='w-[80%]'>
-        <h3>Top 20 Players</h3>
+    <ScrollShadow className="w-[80%] h-screen overflow-auto" >
+      <div className="flex flex-col">
         {playersStats.length > 0 ? (
-          <Card className="py-10 flex flex-col">
+          <div>
             {playersStats.map((player, index) => (
-              <CardBody
-                key={index}
-                className="border-none bg-background/60 dark:bg-default-100/50 mb-4 p-4 rounded-md flex flex-row gap-4"
-                isBlurred
-                shadow="sm"
-              >
-                <div className='flex flex-col items-center justify-center'>
-                  <span>
-                    {player.name}:
-                  </span>
-                  <span className='text-default-500 text-sm'>
-                    ({player.team})
-                  </span>
-                </div>
-                <div className='flex flex-col items-center justify-center'>
-                  <span>
-                    {player.criteriaMet}/{player.totalGames}
-                  </span>
-                  <span className='text-default-500 text-sm'>
-                    ({((player.criteriaMet * 100) / player.totalGames).toFixed(0)}%)
-                  </span>
-                </div>
-                <div className='flex flex-col items-center justify-center'>
-                  <span>
-                    Máximo de jogos sem critérios
-                  </span>
-                  <span className='text-default-500 text-sm'>
-                    {player.maxGamesWithoutCriteria}
-                  </span>
-                </div>
-                <div className='flex flex-col items-center justify-center'>
-                  <span>
-                    Últimos 10 jogos
-                  </span>
-                  <span className='flex'>
-                    {player.last10Games.map(renderGameResult)}
-                  </span>
-                </div>
-              </CardBody>
+              <div className='mb-4' key={index} style={{backgroundColor: "rgba(27, 27, 27, 0.6)", backdropFilter: "blur(20px)", borderRadius: "12px", padding: "32px"}}>
+              {/* Column Headers */}
+              <div style={{ marginBottom: "20px" }} className="grid grid-cols-6">
+                {columns.map((column, index) => (
+                  <div
+                    className={`grid ${column.columnSpan} ${column.justifyItems}`}
+                    key={index}
+                    style={{
+                      color: "#868686",
+                      fontSize: "0.875rem",
+                      fontWeight: "500",
+                    }}
+                  >
+                    {column.label}
+                  </div>
+                ))}
+              </div>
+
+              {/* Content Row */}
+          <div style={{ alignItems: "center", justifyContent: "space-between",}} className="grid grid-cols-6">
+            {/* Player Info */}
+            <div>
+              <div style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
+                {player.name}
+              </div>
+              <div style={{ color: "#868686", fontSize: "0.6875rem", fontWeight: "500",}}>
+                {player.team}
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="grid justify-items-center">
+              <div style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
+                {player.criteriaMet}/{player.totalGames}
+              </div>
+              <div style={{color: "#868686", fontSize: "0.6875rem", fontWeight: "500",}} >
+                {((player.criteriaMet * 100) / player.totalGames).toFixed(0)}%
+              </div>
+            </div>
+
+            {/* Match Count */}
+            <div className="grid justify-items-center">
+              <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
+                {player.maxGamesWithoutCriteria}
+              </span>
+            </div>
+
+            {/* Match Indicators */}
+            <div className="col-span-2 grid justify-items-center grid-flow-col">
+              {player.last10Games.map(renderGameResult)}
+            </div>
+
+            {/* Notification Icon */}
+            <div className="justify-items-end mr-12">
+              <Star size={25} color="white" />
+            </div>
+          </div>
+
+
+
+              
+              </div>
             ))}
-          </Card>
+          </div>
         ) : (
           <p>No players found.</p>
         )}
       </div>
+      </ScrollShadow>
     </div>
   );
 };

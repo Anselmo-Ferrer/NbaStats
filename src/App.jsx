@@ -7,11 +7,11 @@ import TeamsDetail from "./times.jsx"
 function App() {
 
   return (
-    <div className="bg-black h-screen w-full px-10">
+    <div className="bg-black h-full w-full px-10">
       <Background />
       <Navbar />
       < PlayerStatsFilter />
-      <Box />
+      {/* <Box /> */}
       {/* <TeamsDetail /> */}
     </div>
   )
