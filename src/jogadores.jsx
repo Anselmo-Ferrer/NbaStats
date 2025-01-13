@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import LZString from 'lz-string';
-import {Card, CardBody} from "@nextui-org/react";
+import { Button, Card, CardBody, Input } from "@nextui-org/react";
 
 const PlayerStatsFilter = () => {
   const apiKeys = [
@@ -20,9 +20,9 @@ const PlayerStatsFilter = () => {
     import.meta.env.VITE_API_KEY_15,
   ];
 
-  const [points, setPoints] = useState(10);
-  const [assists, setAssists] = useState(5);
-  const [rebounds, setRebounds] = useState(3);
+  const [points, setPoints] = useState();
+  const [assists, setAssists] = useState();
+  const [rebounds, setRebounds] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [playersStats, setPlayersStats] = useState([]);
@@ -54,57 +54,66 @@ const PlayerStatsFilter = () => {
     setLoading(true);
     setError(null);
     setGamesFetched(0);
-
-    const totalMatchs = 546
-    const gamesEndId = 14084; // 50 partidas
-    const gamesStartId = gamesEndId + totalMatchs;
-    const totalGames = gamesStartId - gamesEndId + 1; // Número total de partidas
-    setTimeRemaining(totalGames * 0.2); // Tempo total estimado em segundos
-
-    const allGameData = [];
-
+  
+    const startGameId = 14084; // ID inicial do primeiro jogo
+    let lastSavedGameId = startGameId - 1; // ID do último jogo salvo (começamos antes do primeiro jogo)
+    const newGameData = [];
+  
     try {
-      for (let gameId = gamesStartId; gameId >= gamesEndId; gameId--) {
+      // Verifica o localStorage para encontrar o último jogo salvo
+      const compressedData = localStorage.getItem("compressedGameData");
+      if (compressedData) {
+        const existingData = JSON.parse(LZString.decompress(compressedData));
+        const gameIds = new Set(existingData.map((game) => game.game.id));
+        lastSavedGameId = Math.max(...gameIds);
+        console.log(`Último jogo salvo encontrado: ${lastSavedGameId}`);
+      }
+  
+      // Buscar apenas os jogos após o último salvo
+      for (let gameId = lastSavedGameId + 1; ; gameId++) {
         try {
           const data = await fetchGameStats(gameId);
-
+  
           if (data.response && data.response.length > 0) {
-            allGameData.push(...data.response); // Adiciona os dados brutos
+            newGameData.push(...data.response);
+          } else {
+            console.log(`Jogo ${gameId} não encontrado, encerrando busca.`);
+            break; // Sai do loop ao encontrar um jogo inexistente
           }
-
-          // Incrementa o contador de partidas buscadas
+  
+          // Atualiza o contador de jogos buscados
           setGamesFetched((prev) => prev + 1);
-
-          // Reduz o tempo restante
-          setTimeRemaining((prev) => prev - 1.5);
-
+  
           // Alterna a chave da API
           currentKeyIndex = (currentKeyIndex + 1) % apiKeys.length;
-
-          // Aguarda 1.5 segundos antes de continuar
+  
+          // Aguarda para evitar problemas de limite de taxa
           await new Promise((resolve) => setTimeout(resolve, 200));
-          console.log(`Jogo ${gameId} salvo na API ${currentKeyIndex}`)
+          console.log(`Jogo ${gameId} buscado com sucesso.`);
         } catch (err) {
-          console.error(`API ${currentKeyIndex}: Erro ao buscar dados do jogo ${gameId}:`, err);
-          setFalhas((prevFalhas) => [...prevFalhas, gameId]);
-          for (let j = 0; j < falhas.length; j++) {
-            console.log(falhas[j])
-          }
+          console.error(`Erro ao buscar dados do jogo ${gameId}:`, err);
+          break; // Sai do loop ao encontrar erro
         }
       }
-
-      const compressedData = LZString.compress(JSON.stringify(allGameData));
-      localStorage.setItem('compressedGameData', compressedData);
-
-      // Salva os dados brutos no localStorage
-      alert('Dados comprimidos e salvos no Local Storage com sucesso!');
+  
+      // Adiciona os novos jogos aos dados existentes
+      const updatedGameData = compressedData
+        ? JSON.parse(LZString.decompress(compressedData)).concat(newGameData)
+        : newGameData;
+  
+      // Comprime e salva os dados no localStorage
+      const compressedUpdatedData = LZString.compress(
+        JSON.stringify(updatedGameData)
+      );
+      localStorage.setItem("compressedGameData", compressedUpdatedData);
+  
+      alert("Novos jogos salvos no Local Storage com sucesso!");
     } catch (err) {
-      console.error('Erro ao buscar os dados:', err);
-      setError('Falha ao buscar os dados. Por favor, tente novamente.');
+      console.error("Erro ao buscar os dados:", err);
+      setError("Falha ao buscar os dados. Por favor, tente novamente.");
     } finally {
       setLoading(false);
     }
-  
   };
 
   const applyFilters = () => {
@@ -187,28 +196,36 @@ const PlayerStatsFilter = () => {
     return `${minutes}m ${remainingSeconds}s`;
   };
 
+  // Função para renderizar bolinhas verdes (Vitória) e vermelhas (Derrota)
+  const renderGameResult = (result) => {
+    const color = result === "V" ? "green" : "red";
+    return (
+      <span 
+        className='rounded-full mr-2 flex items-center justify-center'
+        style={{
+          backgroundColor: color, 
+          width: '20px', 
+          height: '20px', 
+          opacity: '0.4'
+        }} 
+      >
+      </span>
+    );
+  };
+
   return (
     <div className='py-10 flex'>
       <div className='flex flex-col w-[20%]'>
         <h2>Player Stats Filter</h2>
-        <label>
-          Points:
-          <input type="number" value={points} onChange={(e) => setPoints(Number(e.target.value))} />
-        </label>
-        <label>
-          Assists:
-          <input type="number" value={assists} onChange={(e) => setAssists(Number(e.target.value))} />
-        </label>
-        <label>
-          Rebounds:
-          <input type="number" value={rebounds} onChange={(e) => setRebounds(Number(e.target.value))} />
-        </label>
-        <button onClick={fetchAndStoreData} disabled={loading}>
+          <Input label="Pontos" labelPlacement="inside" type="number" value={points} onChange={(e) => setPoints(Number(e.target.value))}/>
+          <Input label="Pontos" labelPlacement="inside" type="number" value={assists} onChange={(e) => setAssists(Number(e.target.value))} />
+          <Input label="Pontos" labelPlacement="inside" type="number" value={rebounds} onChange={(e) => setRebounds(Number(e.target.value))} />
+        <Button color='primary' onClick={fetchAndStoreData} disabled={loading}>
           {loading ? 'Fetching...' : 'Fetch and Save Data'}
-        </button>
-        <button onClick={applyFilters} disabled={loading}>
+        </Button>
+        <Button color='primary' onClick={applyFilters} disabled={loading}>
           Apply Filters
-        </button>
+        </Button>
       </div>
 
       {error && <div style={{ color: 'red' }}>{error}</div>}
@@ -226,19 +243,45 @@ const PlayerStatsFilter = () => {
           <Card className="py-10 flex flex-col">
             {playersStats.map((player, index) => (
               <CardBody
-              key={index}
-              className="border-none bg-background/60 dark:bg-default-100/50 mb-4 p-4 rounded-md"
-              isBlurred
-              shadow="sm"
-            >
-              {player.name} ({player.team}): {player.criteriaMet}/{player.totalGames} - 
-              {((player.criteriaMet * 100) / player.totalGames).toFixed(0)}%
-              <br />
-              Máximo de jogos sem critérios: {player.maxGamesWithoutCriteria}
-              <br />
-              Últimos 10 jogos: {player.last10Games.join("/")}
-            </CardBody>
-            ))} 
+                key={index}
+                className="border-none bg-background/60 dark:bg-default-100/50 mb-4 p-4 rounded-md flex flex-row gap-4"
+                isBlurred
+                shadow="sm"
+              >
+                <div className='flex flex-col items-center justify-center'>
+                  <span>
+                    {player.name}:
+                  </span>
+                  <span className='text-default-500 text-sm'>
+                    ({player.team})
+                  </span>
+                </div>
+                <div className='flex flex-col items-center justify-center'>
+                  <span>
+                    {player.criteriaMet}/{player.totalGames}
+                  </span>
+                  <span className='text-default-500 text-sm'>
+                    ({((player.criteriaMet * 100) / player.totalGames).toFixed(0)}%)
+                  </span>
+                </div>
+                <div className='flex flex-col items-center justify-center'>
+                  <span>
+                    Máximo de jogos sem critérios
+                  </span>
+                  <span className='text-default-500 text-sm'>
+                    {player.maxGamesWithoutCriteria}
+                  </span>
+                </div>
+                <div className='flex flex-col items-center justify-center'>
+                  <span>
+                    Últimos 10 jogos
+                  </span>
+                  <span className='flex'>
+                    {player.last10Games.map(renderGameResult)}
+                  </span>
+                </div>
+              </CardBody>
+            ))}
           </Card>
         ) : (
           <p>No players found.</p>
