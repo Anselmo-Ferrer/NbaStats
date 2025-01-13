@@ -1,11 +1,12 @@
-export default function navbar() {
+export default function NavbarComponent() {
   return (
-    <div className="bg-stone-800 p-4 flex gap-20 justify-center">
-      <a href="">Jogadores</a>
-      <a href="">Time</a>
-      <a href="">Apostas</a>
-      <a href="">Classificacao</a>
-      <a href="">Favoritos</a>
+    <div className="bg-stone-800 p-4 flex gap-20 justify-center" style={{backgroundColor: "rgba(27, 27, 27, 0.6)", backdropFilter: "blur(20px)", borderRadius: "12px"}}>
+      <a href="/">Jogadores</a>
+      <a href="/teams">Time</a>
+      <a href="/bet">Apostas</a>
+      <a href="/standigs">Classificacao</a>
+      <a href="/favorites">Favoritos</a>
     </div>
   )
+  
 }

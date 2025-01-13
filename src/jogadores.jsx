@@ -310,7 +310,9 @@ const PlayerStatsFilter = () => {
             ))}
           </div>
         ) : (
-          <p>No players found.</p>
+          <div className='w-full h-[300px] flex justify-center items-center'>
+            <p className='text-4xl'>Busque por criterios.</p>
+          </div>
         )}
       </div>
       </ScrollShadow>

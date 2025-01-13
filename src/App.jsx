@@ -1,19 +1,14 @@
-import Background from "./background.jsx"
-import PlayerStatsFilter from "./jogadores.jsx"
-import Navbar from "./navbar.jsx"
-import Box from "./teste.jsx"
-import TeamsDetail from "./times.jsx"
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import PlayersPage from "./pages/PlayersPage.jsx"
 
 function App() {
 
   return (
-    <div className="bg-black h-full w-full px-10">
-      <Background />
-      <Navbar />
-      < PlayerStatsFilter />
-      {/* <Box /> */}
-      {/* <TeamsDetail /> */}
-    </div>
+    <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<PlayersPage />} />
+        </Routes>
+    </BrowserRouter>
   )
 }
 
