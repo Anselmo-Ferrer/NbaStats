@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import LZString from 'lz-string';
-import { Button, Card, CardBody, Input, ScrollShadow } from "@nextui-org/react";
+import { Button, Input, ScrollShadow } from "@nextui-org/react";
 import { Star } from 'lucide-react';
 
 const columns = [
@@ -28,15 +28,15 @@ const PlayerStatsFilter = () => {
     import.meta.env.VITE_API_KEY_15,
   ];
 
-  const [points, setPoints] = useState();
-  const [assists, setAssists] = useState();
-  const [rebounds, setRebounds] = useState();
+  const [points, setPoints] = useState(0);
+  const [assists, setAssists] = useState(0);
+  const [rebounds, setRebounds] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [playersStats, setPlayersStats] = useState([]);
   const [gamesFetched, setGamesFetched] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0); // Tempo restante em segundos
-  const [falhas, setFalhas] = useState([])
+  const [playerName, setPlayerName] = useState()
 
   let currentKeyIndex = 0;
 
@@ -124,6 +124,25 @@ const PlayerStatsFilter = () => {
     }
   };
 
+  const aoMexerPontos = (e) => {
+    setPoints(Number(e.target.value))
+    applyFilters()
+  }
+
+  const aoMexerAssistencias = (e) => {
+    setAssists(Number(e.target.value))
+    applyFilters()
+  }
+
+  const aoMexerRebotes = (e) => {
+    setRebounds(Number(e.target.value))
+    applyFilters()
+  }
+
+  const aoMexerNome = (e) => {
+    setPlayerName(e.target.value)
+  }
+
   const applyFilters = () => {
     const compressedData = localStorage.getItem('compressedGameData');
     if (!compressedData) {
@@ -150,6 +169,7 @@ const PlayerStatsFilter = () => {
           team: teamName,
           totalGames: 0,
           criteriaMet: 0,
+          percentage: 0,
           maxGamesWithoutCriteria: 0,
           currentGamesWithoutCriteria: 0,
           last10Games: [], // Array para armazenar os resultados dos últimos 10 jogos
@@ -185,16 +205,24 @@ const PlayerStatsFilter = () => {
         player.maxGamesWithoutCriteria,
         player.currentGamesWithoutCriteria
       );
+      player.percentage = ((player.criteriaMet * 100) / player.totalGames).toFixed(0)
     });
   
     const filteredPlayers = Object.values(playerStats)
-      .filter((player) => player.criteriaMet > 0)
-      .sort((a, b) => {
-        const percentageA = (a.criteriaMet / a.totalGames) * 100;
-        const percentageB = (b.criteriaMet / b.totalGames) * 100;
-        return percentageB - percentageA;
-      });
-  
+    .filter((player) => {
+      // Filtra pelos critérios e pelo nome, caso `playerName` esteja preenchido
+      const matchesName = playerName
+        ? player.name.toLowerCase().includes(playerName.toLowerCase())
+        : true;
+
+      return matchesName && player.criteriaMet > 0;
+    })
+    .sort((a, b) => {
+      const percentageA = (a.criteriaMet / a.totalGames) * 100;
+      const percentageB = (b.criteriaMet / b.totalGames) * 100;
+      return percentageB - percentageA;
+    });
+
     setPlayersStats(filteredPlayers.slice(0, 20));
   };
 
@@ -219,9 +247,10 @@ const PlayerStatsFilter = () => {
   return (
     <div className='py-10 flex gap-4'>
       <div className='flex flex-col w-[20%] gap-4'>
-          <Input label="Pontos" labelPlacement="inside" type="number" value={points} onChange={(e) => setPoints(Number(e.target.value))}/>
-          <Input label="Assistencias" labelPlacement="inside" type="number" value={assists} onChange={(e) => setAssists(Number(e.target.value))} />
-          <Input label="Rebotes" labelPlacement="inside" type="number" value={rebounds} onChange={(e) => setRebounds(Number(e.target.value))} />
+          <Input label="Pontos" labelPlacement="inside" type="number" value={points} onChange={aoMexerPontos}/>
+          <Input label="Assistencias" labelPlacement="inside" type="number" value={assists} onChange={aoMexerAssistencias} />
+          <Input label="Rebotes" labelPlacement="inside" type="number" value={rebounds} onChange={aoMexerRebotes} />
+          <Input label="Jogador" labelPlacement="inside" type="text" onChange={aoMexerNome}  />
         <Button className='bg-[#FF6600]' onPress={applyFilters} disabled={loading}>
           Filtrar
         </Button>
@@ -281,7 +310,7 @@ const PlayerStatsFilter = () => {
                 {player.criteriaMet}/{player.totalGames}
               </div>
               <div style={{color: "#868686", fontSize: "0.6875rem", fontWeight: "500",}} >
-                {((player.criteriaMet * 100) / player.totalGames).toFixed(0)}%
+                {player.percentage}%
               </div>
             </div>
 
