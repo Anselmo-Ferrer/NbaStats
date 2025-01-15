@@ -42,7 +42,6 @@ export default function TesteFetch() {
 
 
 
-
   const handleButtonClick = async () => {
     const gameId = 14084; // Exemplo de gameId
     const data = await fetchGameStats(gameId);
