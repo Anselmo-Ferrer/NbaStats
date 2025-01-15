@@ -94,7 +94,7 @@ const PlayerStatsFilter = () => {
   
           // Alterna a chave da API
           currentKeyIndex = (currentKeyIndex + 1) % apiKeys.length;
-  
+
           // Aguarda para evitar problemas de limite de taxa
           await new Promise((resolve) => setTimeout(resolve, 200));
           console.log(`Jogo ${gameId} buscado com sucesso.`);
@@ -322,7 +322,7 @@ const PlayerStatsFilter = () => {
             </div>
 
             {/* Match Indicators */}
-            <div className="col-span-2 grid justify-items-center grid-flow-col">
+            <div key={index} className="col-span-2 grid justify-items-center grid-flow-col">
               {player.last10Games.map(renderGameResult)}
             </div>
 
