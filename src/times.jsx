@@ -25,7 +25,7 @@ const TeamsDetail = () => {
         const options = {
           method: 'GET',
           headers: {
-            'X-RapidAPI-Key': '89e8d18db2msh750cb1be8006c38p19c402jsne47214e05847',
+            'X-RapidAPI-Key': import.meta.env.VITE_API_KEY_14,
             'X-RapidAPI-Host': 'api-nba-v1.p.rapidapi.com',
           },
         };
@@ -100,10 +100,9 @@ const TeamsDetail = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid justify-items-center">
-              <div style={{ color: "white", fontWeight: "600", fontSize: "0.95rem" }}>
-              {team.team?.name}
-              </div>
+            <div className="grid justify-items-start grid-flow-col" style={{ color: "white", fontWeight: "600", fontSize: "0.7rem" }}>
+              <img src={team.team?.logo} className='w-[25px] h-[25px]'/>
+              <span>{team.team?.name}</span>
             </div>
 
             {/* Match Count */}
