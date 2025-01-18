@@ -12,6 +12,13 @@ const columns = [
   { label: "Last Matches", justifyItems: "justify-items-center", columnSpan: "col-span-2" },
 ];
 
+const SeeMoreColumns = [
+  { label: "Game", justifyItems: "justify-items-start", columnSpan: "col-span-1" },
+  { label: "Points", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
+  { label: "Assists", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
+  { label: "Rebounds", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
+]
+
 const PlayerStatsFilter = () => {
 
   const [points, setPoints] = useState(0);
@@ -247,15 +254,64 @@ const PlayerStatsFilter = () => {
 
 
                 {/* see matches */}
-                <ScrollShadow className="w-full h-[300px] overflow-auto" >
+                <ScrollShadow className="w-full h-[300px] overflow-auto flex-wrap flex" >
+
+
+
                   {player.lastMatches.map((match, idx) => (
-                    <div className='pl-4 border-b-1 flex justify-between'>
-                      <span key={idx} className='py-4 w-4/5'>
-                        {idx+1 } ({match.gameId}) / pontos: {match.points} / Assistencias: {match.assists} / Rebotes: {match.rebounds}
-                      </span>
-                      <div className='w-[5%] h-[56px] bg-[#448523]'></div>
+                  <div className='w-1/2 flex items-center border-b-1'>
+                    <div className='py-4'>
+                    <div style={{ marginBottom: "20px" }} className="grid grid-cols-5 px-8">
+                    {SeeMoreColumns.map((column, index) => (
+                      <div
+                        className={`grid ${SeeMoreColumns.columnSpan} ${SeeMoreColumns.justifyItems}`}
+                        key={index}
+                        style={{
+                          color: "#868686",
+                          fontSize: "0.875rem",
+                          fontWeight: "500",
+                        }}
+                      >
+                        {column.label}
+                      </div>
+                    ))}
+                  </div>
+
+
+                    <div className='pl-4 grid grid-cols-5'>
+
+                      {/* Player Info */}
+                      <div className="flex flex-col items-center">
+                        <div style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>{idx+1}</div>
+                        <div style={{ color: "#868686", fontSize: "0.6875rem", fontWeight: "500",}}>{match.gameId}</div>
+                      </div>
+
+                      {/* points */}
+                      <div className="grid justify-items-center">
+                        <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
+                        {match.points}
+                        </span>
+                      </div>
+
+                      {/* assits */}
+                      <div className="grid justify-items-center">
+                        <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
+                        {match.assists}
+                        </span>
+                      </div>
+
+                      {/* rebounds */}
+                      <div className="grid justify-items-center">
+                        <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
+                        {match.rebounds}
+                        </span>
+                      </div>
+
+
                     </div>
-                    
+                    </div>
+                    <div className='w-[50px] h-[95%] bg-[#448523] grid justify-items-center'></div>
+                    </div>
                   ))}
                 </ScrollShadow>
 
@@ -267,7 +323,7 @@ const PlayerStatsFilter = () => {
 
 
 
-                
+
 
               </div>
               // end card
