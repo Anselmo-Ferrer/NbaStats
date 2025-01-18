@@ -3,6 +3,7 @@ import PlayersPage from "./pages/PlayersPage.jsx"
 import TeamsPage from './pages/TeamsPage.jsx';
 import BetPage from './pages/BetPage.jsx';
 import FavoritesPage from './pages/FavoritesPage.jsx';
+import StandingsPage from './pages/StandingsPage.jsx';
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<PlayersPage />} />
           <Route path="/teams" element={<TeamsPage />} />
           <Route path="/bet" element={<BetPage />} />
+          <Route path="/standings" element={<StandingsPage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
         </Routes>
     </BrowserRouter>

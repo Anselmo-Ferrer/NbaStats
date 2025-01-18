@@ -3,6 +3,7 @@ import LZString from 'lz-string';
 import { Button, Input, ScrollShadow } from "@nextui-org/react";
 import { Star } from 'lucide-react';
 import FetchAndStoreData from './components/FetchData';
+import { StarFilledIcon } from '@radix-ui/react-icons';
 
 const columns = [
   { label: "Name", justifyItems: "justify-items-start", columnSpan: "col-span-1" },
@@ -18,7 +19,11 @@ const PlayerStatsFilter = () => {
   const [rebounds, setRebounds] = useState(0);
   const [playersStats, setPlayersStats] = useState([]);
   const [playerName, setPlayerName] = useState()
+  const [isFavorite, setIsfavorite] = useState(false)
 
+  const favoritar = () => {
+
+  }
 
   const aoMexerPontos = (e) => {
     setPoints(Number(e.target.value))
@@ -69,8 +74,20 @@ const PlayerStatsFilter = () => {
           maxGamesWithoutCriteria: 0,
           currentGamesWithoutCriteria: 0,
           last10Games: [], // Array para armazenar os resultados dos últimos 10 jogos
+          lastMatches: []
         };
       }
+
+      const Match = {
+        gameId: player.game.id,
+        name: playerName,
+        points: player.points,
+        assists: player.assists,
+        rebounds: player.totReb
+      }
+
+      playerStats[playerId].lastMatches.push(Match)
+      playerStats[playerId].lastMatches.sort((a,b) => b.gameId - a.gameId)
   
       playerStats[playerId].totalGames++;
   
@@ -120,6 +137,7 @@ const PlayerStatsFilter = () => {
       return percentageB - percentageA;
     });
 
+    console.log(playerStats)
     setPlayersStats(filteredPlayers.slice(0, 20));
   };
 
@@ -137,6 +155,8 @@ const PlayerStatsFilter = () => {
 
   return (
     <div className='py-10 flex gap-4'>
+
+      {/* inputs */}
       <div className='flex flex-col w-[20%] gap-4'>
           <Input label="Pontos" labelPlacement="inside" type="number" value={points} onChange={aoMexerPontos}/>
           <Input label="Assistencias" labelPlacement="inside" type="number" value={assists} onChange={aoMexerAssistencias} />
@@ -148,83 +168,118 @@ const PlayerStatsFilter = () => {
         <FetchAndStoreData />
       </div>
 
-
-    <ScrollShadow className="w-[80%] h-screen overflow-auto" >
-      <div className="flex flex-col">
-        {playersStats.length > 0 ? (
-          <div>
-            {playersStats.map((player, index) => (
-              <div className='mb-4' key={index} style={{backgroundColor: "rgba(27, 27, 27, 0.6)", backdropFilter: "blur(20px)", borderRadius: "12px", padding: "32px"}}>
-              {/* Column Headers */}
-              <div style={{ marginBottom: "20px" }} className="grid grid-cols-6">
-                {columns.map((column, index) => (
-                  <div
-                    className={`grid ${column.columnSpan} ${column.justifyItems}`}
-                    key={index}
-                    style={{
-                      color: "#868686",
-                      fontSize: "0.875rem",
-                      fontWeight: "500",
-                    }}
-                  >
-                    {column.label}
-                  </div>
-                ))}
-              </div>
-
-              {/* Content Row */}
-          <div style={{ alignItems: "center", justifyContent: "space-between",}} className="grid grid-cols-6">
-            {/* Player Info */}
+      {/* players cards */}
+      <ScrollShadow className="w-[80%] h-screen overflow-auto" >
+        <div className="flex flex-col">
+          {playersStats.length > 0 ? (
             <div>
-              <div style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
-                {player.name}
-              </div>
-              <div style={{ color: "#868686", fontSize: "0.6875rem", fontWeight: "500",}}>
-                {player.team}
-              </div>
-            </div>
+              {playersStats.map((player, index) => (
+                // card
+                <div className='mb-4 pt-8' key={index} style={{backgroundColor: "rgba(27, 27, 27, 0.6)", backdropFilter: "blur(20px)", borderRadius: "12px"}}>
 
-            {/* Stats */}
-            <div className="grid justify-items-center">
-              <div style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
-                {player.criteriaMet}/{player.totalGames}
+                {/* Column Headers */}
+                <div style={{ marginBottom: "20px" }} className="grid grid-cols-6 px-8">
+                  {columns.map((column, index) => (
+                    <div
+                      className={`grid ${column.columnSpan} ${column.justifyItems}`}
+                      key={index}
+                      style={{
+                        color: "#868686",
+                        fontSize: "0.875rem",
+                        fontWeight: "500",
+                      }}
+                    >
+                      {column.label}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Content Row */}
+                <div style={{ alignItems: "center", justifyContent: "space-between",}} className="grid grid-cols-6 px-8">
+                  {/* Player Info */}
+                  <div>
+                    <div style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
+                      {player.name}
+                    </div>
+                    <div style={{ color: "#868686", fontSize: "0.6875rem", fontWeight: "500",}}>
+                      {player.team}
+                    </div>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="grid justify-items-center">
+                    <div style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
+                      {player.criteriaMet}/{player.totalGames}
+                    </div>
+                    <div style={{color: "#868686", fontSize: "0.6875rem", fontWeight: "500",}} >
+                      {player.percentage}%
+                    </div>
+                  </div>
+
+                  {/* Match Count */}
+                  <div className="grid justify-items-center">
+                    <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
+                      {player.maxGamesWithoutCriteria}
+                    </span>
+                  </div>
+
+                  {/* Match Indicators */}
+                  <div key={index} className="col-span-2 grid justify-items-center grid-flow-col">
+                    {player.last10Games.map(renderGameResult)}
+                  </div>
+
+                  {/* Notification Icon */}
+                  <div className="justify-items-end mr-12">
+                    <button className='flex justify-center items-center' onClick={() => setIsfavorite(!isFavorite)}>
+                      <Star size={25} color="white" hidden={isFavorite} />
+                      <StarFilledIcon size={25} color="white" hidden={!isFavorite} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* see matches button */}
+                <div className='grid grid-cols-1 mt-4'>
+                  <Button>v</Button>
+                </div>
+
+
+
+
+
+                {/* see matches */}
+                <ScrollShadow className="w-full h-[300px] overflow-auto" >
+                  {player.lastMatches.map((match, idx) => (
+                    <div className='pl-4 border-b-1 flex justify-between'>
+                      <span key={idx} className='py-4 w-4/5'>
+                        {idx+1 } ({match.gameId}) / pontos: {match.points} / Assistencias: {match.assists} / Rebotes: {match.rebounds}
+                      </span>
+                      <div className='w-[5%] h-[56px] bg-[#448523]'></div>
+                    </div>
+                    
+                  ))}
+                </ScrollShadow>
+
+
+
+
+
+
+
+
+
+                
+
               </div>
-              <div style={{color: "#868686", fontSize: "0.6875rem", fontWeight: "500",}} >
-                {player.percentage}%
-              </div>
+              // end card
+              ))}
             </div>
-
-            {/* Match Count */}
-            <div className="grid justify-items-center">
-              <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
-                {player.maxGamesWithoutCriteria}
-              </span>
+          ) : (
+            <div className='w-full h-[300px] flex justify-center items-center'>
+              <p className='text-4xl'>Busque por criterios.</p>
             </div>
-
-            {/* Match Indicators */}
-            <div key={index} className="col-span-2 grid justify-items-center grid-flow-col">
-              {player.last10Games.map(renderGameResult)}
-            </div>
-
-            {/* Notification Icon */}
-            <div className="justify-items-end mr-12">
-              <Star size={25} color="white" />
-            </div>
+          )}
           </div>
-
-
-
-              
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className='w-full h-[300px] flex justify-center items-center'>
-            <p className='text-4xl'>Busque por criterios.</p>
-          </div>
-        )}
-      </div>
-      </ScrollShadow>
+        </ScrollShadow>
     </div>
   );
 };

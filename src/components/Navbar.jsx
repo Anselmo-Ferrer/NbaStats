@@ -4,7 +4,7 @@ export default function NavbarComponent() {
       <a href="/">Jogadores</a>
       <a href="/teams">Time</a>
       <a href="/bet">Apostas</a>
-      <a href="/standigs">Classificacao</a>
+      <a href="/standings">Classificacao</a>
       <a href="/favorites">Favoritos</a>
     </div>
   )

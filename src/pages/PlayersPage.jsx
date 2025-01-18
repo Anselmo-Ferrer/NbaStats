@@ -1,6 +1,6 @@
-import Background from "../background";
-import PlayerStatsFilter from "../jogadores";
-import NavbarComponent from "../navbar";
+import Background from "../components/Background";
+import NavbarComponent from "../components/Navbar";
+import PlayerStatsFilter from "../Players";
 
 export default function PlayersPage() {
   return (

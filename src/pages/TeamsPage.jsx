@@ -1,6 +1,6 @@
-import Background from "../background";
-import NavbarComponent from "../navbar";
-import TeamsDetail from "../times";
+import Background from "../components/Background";
+import NavbarComponent from "../components/Navbar";
+import TeamsDetail from "../Teams";
 
 export default function TeamsPage() {
   return (

@@ -1,5 +1,5 @@
-import Background from "../background";
-import NavbarComponent from "../navbar";
+import Background from "../components/Background";
+import NavbarComponent from "../components/Navbar";
 import PlayerStatsFilterTest from "../teste";
 
 export default function BetPage() {

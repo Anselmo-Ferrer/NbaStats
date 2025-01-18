@@ -40,6 +40,12 @@ export default function TesteFetch() {
     }
   };
 
+  const verPartidaEspecifica = async () => {
+    let partida = parseInt(prompt())
+    const data = await fetchGameStats(partida);
+    console.log(data)
+  }
+
 
 
   const handleButtonClick = async () => {
@@ -54,10 +60,19 @@ export default function TesteFetch() {
     }
   };
 
+  const verDados = () => {
+    const compressedData = localStorage.getItem('compressedGameData');
+    const rawData = JSON.parse(LZString.decompress(compressedData));
+
+    console.log(rawData)
+  };
+
   return (
     <div>
       <Button onPress={handleButtonClick}>Testar</Button>
       <Button onPress={fetchAndStoreData}>Resetar</Button>
+      <Button onPress={verDados}>Dados</Button>
+      <Button onPress={verPartidaEspecifica}>Especifica</Button>
     </div>
   );
 }

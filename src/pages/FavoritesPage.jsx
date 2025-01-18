@@ -1,6 +1,6 @@
-import Background from "../background";
+import Background from "../components/Background";
+import NavbarComponent from "../components/Navbar";
 import Favorites from "../favorites";
-import NavbarComponent from "../navbar";
 
 export default function FavoritesPage() {
   return (
