@@ -27,6 +27,15 @@ const PlayerStatsFilter = () => {
   const [playersStats, setPlayersStats] = useState([]);
   const [playerName, setPlayerName] = useState()
   const [isFavorite, setIsfavorite] = useState(false)
+  const [seeMatchesState, setSeeMatchesState] = useState({});
+
+  const toggleSeeMatches = (playerId) => {
+    setSeeMatchesState((prev) => ({
+      ...prev,
+      [playerId]: !prev[playerId],
+    }));
+  };
+
 
   const favoritar = () => {
 
@@ -90,7 +99,16 @@ const PlayerStatsFilter = () => {
         name: playerName,
         points: player.points,
         assists: player.assists,
-        rebounds: player.totReb
+        rebounds: player.totReb,
+        criteria: ""
+      }
+
+      if (player.points >= points && player.assists >= assists && player.totReb >= rebounds) {
+        Match.criteria = "V"
+        playerStats[playerId].last10Games.push("V")
+      } else {
+        Match.criteria = "F"
+        playerStats[playerId].last10Games.push("F")
       }
 
       playerStats[playerId].lastMatches.push(Match)
@@ -110,15 +128,10 @@ const PlayerStatsFilter = () => {
           playerStats[playerId].currentGamesWithoutCriteria
         );
         playerStats[playerId].currentGamesWithoutCriteria = 0;
-        playerStats[playerId].last10Games.push("V");
       } else {
         playerStats[playerId].currentGamesWithoutCriteria++;
-        playerStats[playerId].last10Games.push("F");
       }
   
-      // Mantém apenas os últimos 10 jogos
-      playerStats[playerId].last10Games = playerStats[playerId].last10Games.slice(-10);
-      playerStats[playerId].last10Games = playerStats[playerId].last10Games.reverse()
     });
   
     Object.values(playerStats).forEach((player) => {
@@ -232,7 +245,7 @@ const PlayerStatsFilter = () => {
 
                   {/* Match Indicators */}
                   <div key={index} className="col-span-2 grid justify-items-center grid-flow-col">
-                    {player.last10Games.map(renderGameResult)}
+                    {player.last10Games.map(renderGameResult).slice(-10)}
                   </div>
 
                   {/* Notification Icon */}
@@ -246,42 +259,46 @@ const PlayerStatsFilter = () => {
 
                 {/* see matches button */}
                 <div className='grid grid-cols-1 mt-4'>
-                  <Button>v</Button>
+                  <Button
+                    onPress={() => toggleSeeMatches(index)}
+                    className="px-4 py-2 bg-blue-500 text-white rounded bg-[#FF6600]"
+                  >
+                    {seeMatchesState[index] ? "Hide Matches" : "See Matches"}
+                  </Button>
                 </div>
 
 
 
 
 
-                {/* see matches */}
-                <ScrollShadow className="w-full h-[300px] overflow-auto flex-wrap flex" >
+                {seeMatchesState[index] && (
+                <ScrollShadow className="w-full h-[300px] overflow-auto py-8">
+                  <div style={{ marginBottom: "20px" }} className="grid grid-cols-5 px-8 w-full">
+                      {SeeMoreColumns.map((column, index) => (
+                        <div
+                          className={`grid ${column.columnSpan} ${column.justifyItems}`}
+                          key={index}
+                          style={{
+                            color: "#868686",
+                            fontSize: "0.875rem",
+                            fontWeight: "500",
+                          }}
+                        >
+                          {column.label}
+                        </div>
+                      ))}
+                    </div>
 
 
 
                   {player.lastMatches.map((match, idx) => (
-                  <div className='w-1/2 flex items-center border-b-1'>
-                    <div className='py-4'>
-                    <div style={{ marginBottom: "20px" }} className="grid grid-cols-5 px-8">
-                    {SeeMoreColumns.map((column, index) => (
-                      <div
-                        className={`grid ${SeeMoreColumns.columnSpan} ${SeeMoreColumns.justifyItems}`}
-                        key={index}
-                        style={{
-                          color: "#868686",
-                          fontSize: "0.875rem",
-                          fontWeight: "500",
-                        }}
-                      >
-                        {column.label}
-                      </div>
-                    ))}
-                  </div>
+                  <div className='w-full py-2 px-8 grid grid-cols-5 border-[0.2px] rounded-full mb-2'>
+                  
 
 
-                    <div className='pl-4 grid grid-cols-5'>
 
                       {/* Player Info */}
-                      <div className="flex flex-col items-center">
+                      <div className="flex items-center gap-2">
                         <div style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>{idx+1}</div>
                         <div style={{ color: "#868686", fontSize: "0.6875rem", fontWeight: "500",}}>{match.gameId}</div>
                       </div>
@@ -307,15 +324,15 @@ const PlayerStatsFilter = () => {
                         </span>
                       </div>
 
+                      <div className="grid justify-items-end">
+                        <span className={`w-[25px] h-full rounded-full ${match.criteria === "V" ? "bg-[#448523]" : "bg-[#C62D2D]"}`}></span>
+                      </div>
 
-                    </div>
-                    </div>
-                    <div className='w-[50px] h-[95%] bg-[#448523] grid justify-items-center'></div>
+
                     </div>
                   ))}
                 </ScrollShadow>
-
-
+                )}
 
 
 
