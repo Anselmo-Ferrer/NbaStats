@@ -51,6 +51,7 @@ export default function Background() {
   return (
     <Card
       style={{
+        zIndex: "10",
         position: "absolute",
         width: "1656px",
         height: "753px",

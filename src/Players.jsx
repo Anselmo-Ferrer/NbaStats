@@ -26,7 +26,7 @@ const PlayerStatsFilter = () => {
   const [rebounds, setRebounds] = useState(0);
   const [playersStats, setPlayersStats] = useState([]);
   const [playerName, setPlayerName] = useState()
-  const [isFavorite, setIsfavorite] = useState(false)
+  const [isFavorite, setIsfavorite] = useState({})
   const [seeMatchesState, setSeeMatchesState] = useState({});
 
   const toggleSeeMatches = (playerId) => {
@@ -37,8 +37,11 @@ const PlayerStatsFilter = () => {
   };
 
 
-  const favoritar = () => {
-
+  const favoritar = (playerId) => {
+    setIsfavorite((prev) => ({
+      ...prev,
+      [playerId]: !prev[playerId],
+    }));
   }
 
   const aoMexerPontos = (e) => {
@@ -174,10 +177,10 @@ const PlayerStatsFilter = () => {
   };
 
   return (
-    <div className='py-10 flex gap-4'>
+    <div className='py-10 flex w-[80%] flex-col gap-4 z-50'>
 
       {/* inputs */}
-      <div className='flex flex-col w-[20%] gap-4'>
+      <div className='flex w-full gap-4'>
           <Input label="Pontos" labelPlacement="inside" type="number" value={points} onChange={aoMexerPontos}/>
           <Input label="Assistencias" labelPlacement="inside" type="number" value={assists} onChange={aoMexerAssistencias} />
           <Input label="Rebotes" labelPlacement="inside" type="number" value={rebounds} onChange={aoMexerRebotes} />
@@ -189,7 +192,7 @@ const PlayerStatsFilter = () => {
       </div>
 
       {/* players cards */}
-      <ScrollShadow className="w-[80%] h-screen overflow-auto" >
+      <ScrollShadow className="w-full h-screen overflow-auto" >
         <div className="flex flex-col">
           {playersStats.length > 0 ? (
             <div>
@@ -250,10 +253,9 @@ const PlayerStatsFilter = () => {
 
                   {/* Notification Icon */}
                   <div className="justify-items-end mr-12">
-                    <button className='flex justify-center items-center' onClick={() => setIsfavorite(!isFavorite)}>
-                      <Star size={25} color="white" hidden={isFavorite} />
-                      <StarFilledIcon size={25} color="white" hidden={!isFavorite} />
-                    </button>
+                  <button className='flex justify-center items-center' onClick={() => favoritar(index)}>
+                    {isFavorite[index] ? <StarFilledIcon size={25} color="white" /> : <Star size={25} color="white" />}
+                  </button>
                   </div>
                 </div>
 
@@ -292,7 +294,7 @@ const PlayerStatsFilter = () => {
 
 
                   {player.lastMatches.map((match, idx) => (
-                  <div className='w-full py-2 px-8 grid grid-cols-5 border-[0.2px] rounded-full mb-2'>
+                  <div className='w-full py-2 px-8 grid grid-cols-5 rounded-full mb-2'>
                   
 
 

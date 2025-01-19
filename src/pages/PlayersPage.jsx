@@ -4,7 +4,7 @@ import PlayerStatsFilter from "../Players";
 
 export default function PlayersPage() {
   return (
-    <div className="bg-black h-full w-full px-10 pt-4">
+    <div className="bg-black flex h-full w-full px-10 pt-4">
       <Background />
       <NavbarComponent />
       <PlayerStatsFilter />
