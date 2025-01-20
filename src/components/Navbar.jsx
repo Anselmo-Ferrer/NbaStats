@@ -31,13 +31,15 @@ export default function Box() {
 
   return (
     <aside
-      className={`h-screen flex flex-col p-4 z-30 transition-all ${
+      className={`h-screen flex flex-col p-4 z-30 transition-all duration-700 ease-in-out${
         isOpen ? "w-1/6" : "w-[80px]"
       }`}
       style={{
         backgroundColor: "rgba(27, 27, 27, 0.6)",
         backdropFilter: "blur(20px)",
-        borderRadius: "12px",
+        borderTopRightRadius: "12px",
+        borderBottomRightRadius: "12px",
+        transition: "all 1.5s ease-in-out"
       }}
     >
       {/* Toggle Button */}

@@ -177,15 +177,15 @@ const PlayerStatsFilter = () => {
   };
 
   return (
-    <div className='p-10 flex w-full flex-col gap-4 z-50'>
+    <div className='p-10 flex w-full flex-col gap-8 z-50'>
 
       {/* inputs */}
       <div className='flex w-full gap-4'>
-          <Input label="Pontos" labelPlacement="inside" type="number" value={points} onChange={aoMexerPontos}/>
-          <Input label="Assistencias" labelPlacement="inside" type="number" value={assists} onChange={aoMexerAssistencias} />
-          <Input label="Rebotes" labelPlacement="inside" type="number" value={rebounds} onChange={aoMexerRebotes} />
-          <Input label="Jogador" labelPlacement="inside" type="text" onChange={aoMexerNome}  />
-        <Button className='bg-[#057EFF] h-full w-[100px]' onPress={applyFilters}>
+          <Input className='w-1/2' label="Pontos" labelPlacement="inside" type="number" value={points} onChange={aoMexerPontos}/>
+          <Input className='w-1/2' label="Assistencias" labelPlacement="inside" type="number" value={assists} onChange={aoMexerAssistencias} />
+          <Input className='w-1/2' label="Rebotes" labelPlacement="inside" type="number" value={rebounds} onChange={aoMexerRebotes} />
+          <Input className='w-1/2' label="Jogador" labelPlacement="inside" type="text" onChange={aoMexerNome}  />
+        <Button className='bg-[#057EFF] h-full w-[100px] w-1/2' onPress={applyFilters}>
           Filtrar
         </Button>
         <FetchAndStoreData />
@@ -248,13 +248,13 @@ const PlayerStatsFilter = () => {
 
                   {/* Match Indicators */}
                   <div key={index} className="col-span-2 grid justify-items-center grid-flow-col">
-                    {player.last10Games.map(renderGameResult).slice(-10)}
+                    {player.last10Games.map(renderGameResult).slice(-10).reverse()}
                   </div>
 
                   {/* Notification Icon */}
                   <div className="justify-items-end mr-12">
                   <button className='flex justify-center items-center' onClick={() => favoritar(index)}>
-                    {isFavorite[index] ? <StarFilledIcon size={25} color="white" /> : <Star size={25} color="white" />}
+                    {isFavorite[index] ? <StarFilledIcon className='w-[25px] h-[25px]' color="white" /> : <Star size={25} color="white" />}
                   </button>
                   </div>
                 </div>
@@ -327,7 +327,7 @@ const PlayerStatsFilter = () => {
                       </div>
 
                       <div className="grid justify-items-end">
-                        <span className={`w-[25px] h-full rounded-full ${match.criteria === "V" ? "bg-[#448523]" : "bg-[#C62D2D]"}`}></span>
+                        <span className={`w-[25px] h-full rounded-full ${match.criteria === "V" ? "bg-[#22c55e]" : "bg-[#C62D2D]"}`}></span>
                       </div>
 
 
