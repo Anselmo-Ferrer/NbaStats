@@ -177,7 +177,7 @@ const PlayerStatsFilter = () => {
   };
 
   return (
-    <div className='py-10 flex w-[80%] flex-col gap-4 z-50'>
+    <div className='p-10 flex w-full flex-col gap-4 z-50'>
 
       {/* inputs */}
       <div className='flex w-full gap-4'>
@@ -185,7 +185,7 @@ const PlayerStatsFilter = () => {
           <Input label="Assistencias" labelPlacement="inside" type="number" value={assists} onChange={aoMexerAssistencias} />
           <Input label="Rebotes" labelPlacement="inside" type="number" value={rebounds} onChange={aoMexerRebotes} />
           <Input label="Jogador" labelPlacement="inside" type="text" onChange={aoMexerNome}  />
-        <Button className='bg-[#FF6600]' onPress={applyFilters}>
+        <Button className='bg-[#057EFF] h-full w-[100px]' onPress={applyFilters}>
           Filtrar
         </Button>
         <FetchAndStoreData />
@@ -263,7 +263,7 @@ const PlayerStatsFilter = () => {
                 <div className='grid grid-cols-1 mt-4'>
                   <Button
                     onPress={() => toggleSeeMatches(index)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded bg-[#FF6600]"
+                    className="px-4 py-2 bg-blue-500 text-white rounded bg-[#057EFF]"
                   >
                     {seeMatchesState[index] ? "Hide Matches" : "See Matches"}
                   </Button>

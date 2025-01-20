@@ -63,7 +63,7 @@ const TeamsDetail = () => {
   }
 
   return (
-    <ScrollShadow className="w-[100%] h-screen overflow-auto py-10" >
+    <ScrollShadow className="w-[100%] h-screen overflow-auto py-10 z-100" >
       <div className="flex flex-col" style={{backgroundColor: "rgba(27, 27, 27, 0.6)", backdropFilter: "blur(20px)", borderRadius: "12px", padding: "32px"}}>
         {teams.length > 0 ? (
           <div>
