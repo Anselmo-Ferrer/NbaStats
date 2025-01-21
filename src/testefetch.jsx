@@ -60,9 +60,29 @@ export default function TesteFetch() {
     }
   };
 
+
+  const localStorageGroups = () => {
+    // Recuperar e descompactar os dados existentes
+    const compressedData = localStorage.getItem('compressedGameData');
+    const rawData = JSON.parse(LZString.decompress(compressedData));
+    
+    // Compactar os dados novamente para 'apiData'
+    const compressed = LZString.compress(JSON.stringify(rawData));
+    localStorage.setItem("PlayersGameData", compressed);
+  
+    console.log("Dados salvos em 'apiData' com sucesso!");
+  };
+
   const verDados = () => {
     const compressedData = localStorage.getItem('compressedGameData');
     const rawData = JSON.parse(LZString.decompress(compressedData));
+
+    console.log(rawData)
+  };
+
+  const verDados2 = () => {
+    const apiData = localStorage.getItem('PlayersGameData');
+    const rawData = JSON.parse(LZString.decompress(apiData));
 
     console.log(rawData)
   };
@@ -72,6 +92,8 @@ export default function TesteFetch() {
       <Button onPress={handleButtonClick}>Testar</Button>
       <Button onPress={fetchAndStoreData}>Resetar</Button>
       <Button onPress={verDados}>Dados</Button>
+      <Button onPress={verDados2}>Dados2</Button>
+      <Button onPress={localStorageGroups}>Criar</Button>
       <Button onPress={verPartidaEspecifica}>Especifica</Button>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import LZString from 'lz-string';
 import { Button, Input, ScrollShadow } from "@nextui-org/react";
 import { Star } from 'lucide-react';
@@ -38,11 +38,45 @@ const PlayerStatsFilter = () => {
 
 
   const favoritar = (playerId) => {
+    // Atualiza estado de favoritos
     setIsfavorite((prev) => ({
       ...prev,
       [playerId]: !prev[playerId],
     }));
-  }
+  
+    // Obtém dados compactados do localStorage
+    const compressedData = localStorage.getItem('FavoritesData');
+    let rawData = [];
+  
+    if (compressedData) {
+      // Descompacta e converte para JSON, garantindo que seja um array
+      rawData = JSON.parse(LZString.decompress(compressedData));
+    }
+  
+    // Garante que rawData seja um array
+    if (!Array.isArray(rawData)) {
+      rawData = [rawData];
+    }
+  
+    // Adiciona o novo jogador aos dados
+    const playerData = playersStats[playerId];
+    if (!rawData.some((player) => player.id === playerId)) {
+      rawData.push(playerData);
+    } else {
+      // Remove o jogador caso já esteja nos favoritos (se for um toggle)
+      rawData = rawData.filter((player) => player.id !== playerId);
+    }
+  
+    // Compacta os dados atualizados e salva no localStorage
+    const favoritesCompressed = LZString.compress(JSON.stringify(rawData));
+    localStorage.setItem("FavoritesData", favoritesCompressed);
+  
+    console.log("Jogador atualizado:", playerData);
+  };
+
+  useEffect(() => {
+    console.log(isFavorite)
+  }, [isFavorite])
 
   const aoMexerPontos = (e) => {
     setPoints(Number(e.target.value))
@@ -93,7 +127,10 @@ const PlayerStatsFilter = () => {
           maxGamesWithoutCriteria: 0,
           currentGamesWithoutCriteria: 0,
           last10Games: [], // Array para armazenar os resultados dos últimos 10 jogos
-          lastMatches: []
+          lastMatches: [],
+          filterPoints: points,
+          filterAssists: assists,
+          filterRebounds: rebounds
         };
       }
 
@@ -164,6 +201,12 @@ const PlayerStatsFilter = () => {
     setPlayersStats(filteredPlayers.slice(0, 20));
   };
 
+
+
+  const addFavorites = () => {
+    
+  }
+
   // Função para renderizar bolinhas verdes (Vitória) e vermelhas (Derrota)
   const renderGameResult = (result) => {
     const color = result === "V" ? "rgb(34, 197, 94)" : "#C62D2D";
@@ -180,12 +223,14 @@ const PlayerStatsFilter = () => {
     <div className='p-10 flex w-full flex-col gap-8 z-50'>
 
       {/* inputs */}
-      <div className='flex w-full gap-4'>
-          <Input className='w-1/2' label="Pontos" labelPlacement="inside" type="number" value={points} onChange={aoMexerPontos}/>
-          <Input className='w-1/2' label="Assistencias" labelPlacement="inside" type="number" value={assists} onChange={aoMexerAssistencias} />
-          <Input className='w-1/2' label="Rebotes" labelPlacement="inside" type="number" value={rebounds} onChange={aoMexerRebotes} />
-          <Input className='w-1/2' label="Jogador" labelPlacement="inside" type="text" onChange={aoMexerNome}  />
-        <Button className='bg-[#057EFF] h-full w-[100px] w-1/2' onPress={applyFilters}>
+      <div className='flex flex-col md:flex-row w-full gap-4'>
+        <div className='w-full flex flex-col md:flex-row gap-4'>
+          <Input className='w-full md:w-1/2' label="Pontos" labelPlacement="inside" type="number" value={points} onChange={aoMexerPontos}/>
+          <Input className='w-full md:w-1/2' label="Assistencias" labelPlacement="inside" type="number" value={assists} onChange={aoMexerAssistencias} />
+          <Input className='w-full md:w-1/2' label="Rebotes" labelPlacement="inside" type="number" value={rebounds} onChange={aoMexerRebotes} />
+        </div>
+          <Input className='w-full md:w-1/2' label="Jogador" labelPlacement="inside" type="text" onChange={aoMexerNome}  />
+        <Button className='bg-[#057EFF] h-[55px] w-full md:w-1/2' onPress={applyFilters}>
           Filtrar
         </Button>
         <FetchAndStoreData />

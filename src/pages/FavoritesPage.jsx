@@ -4,7 +4,7 @@ import Favorites from "../favorites";
 
 export default function FavoritesPage() {
   return (
-    <div className="bg-black h-full w-full px-10 pt-4">
+    <div className="bg-black flex h-full w-full">
       <Background />
       <NavbarComponent />
       <Favorites />

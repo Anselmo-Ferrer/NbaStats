@@ -1,13 +1,9 @@
-import Background from "../components/Background";
-import NavbarComponent from "../components/Navbar";
-import TeamsDetail from "../Teams";
+import TesteFetch from "../testefetch";
 
 export default function TeamsPage() {
   return (
-    <div className="bg-black h-full w-full px-10 pt-4">
-      <Background />
-      <NavbarComponent />
-      <TeamsDetail />
+    <div className="bg-black flex h-full w-full">
+      <TesteFetch />
     </div>
   )
 }

@@ -66,6 +66,7 @@ export default function Background() {
           height: "753px",
           top: "0",
           left: "0",
+          zIndex: "1"
         }}
       >
         {gradientBlobs.map((blob, index) => (

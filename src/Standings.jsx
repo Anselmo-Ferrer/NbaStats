@@ -3,7 +3,7 @@ import { Star } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-const TeamsDetail = () => {
+export default function Standings() {
   const { id: paramId, selectedTeam: paramSelectedTeam } = useParams();
   const [teams, setTeams] = useState([]);
   const [id, setId] = useState(paramId || 802); // Default to 802 if paramId is undefined
@@ -63,7 +63,7 @@ const TeamsDetail = () => {
   }
 
   return (
-    <ScrollShadow className="w-[100%] h-screen overflow-auto py-10 z-100" >
+    <ScrollShadow className="w-[100%] h-screen overflow-auto p-10 z-100" >
       <div className="flex flex-col" style={{backgroundColor: "rgba(27, 27, 27, 0.6)", backdropFilter: "blur(20px)", borderRadius: "12px", padding: "32px"}}>
         {teams.length > 0 ? (
           <div>
@@ -146,5 +146,3 @@ const TeamsDetail = () => {
       </ScrollShadow>
   );
 };
-
-export default TeamsDetail;
