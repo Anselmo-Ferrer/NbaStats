@@ -1,6 +1,7 @@
 import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ScrollShadow, useDisclosure } from "@nextui-org/react";
 import { Check, Edit, Plus, Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import CardTest from "./cardtest";
 
 export default function Bet() {
 
@@ -12,7 +13,7 @@ export default function Bet() {
 
   const betColumns = [
     { label: "Jogos", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
-    { label: "Odd media", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
+    { label: "Odd", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
     { label: "Gale", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
     { label: "Gasto", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
     { label: "Retorno", justifyItems: "justify-items-center", columnSpan: "col-span-1" },
@@ -33,6 +34,8 @@ export default function Bet() {
   const [assists, setAssists] = useState();
   const [rebounds, setRebounds] = useState();
   const [cardsData, setCardsData] = useState([]);
+  const [gameEntry, setGameEntry] = useState()
+  const [gameOdd, setGameOdd] = useState()
 
 
   const criarCard = () => {
@@ -42,7 +45,12 @@ export default function Bet() {
       points: points,
       assists: assists,
       rebounds: rebounds,
-      odds: [],
+      totalGames: 0,
+      avarageOdd: 0,
+      gale: 0,
+      moneySpent: 0,
+      moneyReturn: 0,
+      games: [],
     }
 
     setCardsData((prevCardsData) => [...prevCardsData, card]);
@@ -50,15 +58,55 @@ export default function Bet() {
 
   }
 
+  const addGame = (index) => {
+    const game = {
+      gameEntry: gameEntry,
+      gameOdd: gameOdd,
+      gameReturn: (gameEntry * gameOdd).toFixed(2),
+    };
+
+    // Cria uma cópia do estado atual de cardsData
+    const updatedCards = [...cardsData];
+  
+    // Adiciona o jogo no array de games do card especificado
+    updatedCards[index].games.push(game);
+  
+    // Atualiza os valores relacionados no card
+    updatedCards[index].totalGames = updatedCards[index].games.length;
+    updatedCards[index].avarageOdd = 
+      updatedCards[index].games.reduce((sum, game) => sum + game.gameOdd, 0) / updatedCards[index].games.length;
+    updatedCards[index].moneySpent += game.gameEntry;
+    updatedCards[index].moneyReturn = game.gameReturn;
+
+    if (updatedCards[index].games.length > 1) {
+      const currentIndex = updatedCards[index].games.length - 1;
+      const currentEntry = updatedCards[index].games[currentIndex].gameEntry;
+      const previousEntry = updatedCards[index].games[currentIndex - 1].gameEntry;
+  
+      updatedCards[index].gale = (currentEntry / previousEntry).toFixed(2)
+    } else {
+      // Caso não existam jogos suficientes, gale é 0 ou indefinido
+      updatedCards[index].gale = 0; 
+    }
+  
+    // Atualiza o estado com a cópia modificada
+    setCardsData(updatedCards);
+  
+    console.log("Game adicionado com sucesso", game);
+  };
+
   useEffect(() => {
     console.log(cardsData)
-  }, [cardsData])
+  }, [cardsData]) 
 
 
   return (
     <div className="z-30 flex flex-col p-10 w-full gap-8">
-      <div className="w-full flex justify-between">
-        <h1 className="text-2xl">Apostas</h1>
+      <div className="w-full flex items-end justify-between">
+        <CardTest label={"Total bets"} value={0}/>
+        <CardTest label={"Acertividade"} value={`80%`}/>
+        <CardTest label={"Money Spent"} value={`R$ 37,00`}/>
+        <CardTest label={"Money earned"} value={`R$ 37,00`}/>
         <Button onPress={() => setAddModalOpen(true)} color="primary">Adicionar</Button>
       </div>
       <Modal isOpen={addModalOpen} onOpenChange={setAddModalOpen} className="bg-[#1b1b1b]">
@@ -87,9 +135,15 @@ export default function Bet() {
         </ModalContent>
       </Modal>
 
+
+
+
+
+
+
       {cardsData.map((card, index) => (
       <div className="w-full flex">
-        <div className=' w-1/5 mb-4 py-8 rounded-l-lg' style={{backgroundColor: "#057EFF", backdropFilter: "blur(20px)"}}>
+        <div className=' w-[30%] mb-4 py-8 rounded-l-lg' style={{backgroundColor: "#057EFF", backdropFilter: "blur(20px)"}}>
 
           <div className="w-full flex flex-col items-center pb-4 gap-4">
             <span style={{color: "#000", fontSize: "0.875rem", fontWeight: "500"}} >
@@ -140,7 +194,7 @@ export default function Bet() {
           
         </div>
 
-          <div className='w-2/5 mb-4 py-8 rounded-r-lg flex flex-col justify-between ' style={{backgroundColor: "rgba(27, 27, 27, 0.6)", backdropFilter: "blur(20px)"}}>
+          <div className='w-2/5 mb-4 py-8 flex flex-col justify-between ' style={{backgroundColor: "rgba(27, 27, 27, 0.6)", backdropFilter: "blur(20px)"}}>
             <div className="w-full">
               <div style={{ marginBottom: "20px" }} className="grid grid-cols-5 px-8 w-full">
                 {betColumns.map((column, index) => (
@@ -156,31 +210,31 @@ export default function Bet() {
                 {/* Stats */}
                 <div className="grid justify-items-center">
                   <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
-                    aa
+                    {card.totalGames}
                   </span>
                 </div>
 
                 <div className="grid justify-items-center">
                   <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
-                    aa
+                    {card.avarageOdd}
                   </span>
                 </div>
 
                 <div className="grid justify-items-center">
                   <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
-                    aa
+                    {card.gale}x
                   </span>
                 </div>
 
                 <div className="grid justify-items-center">
                   <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
-                    aa
+                    R$ {card.moneySpent}
                   </span>
                 </div>
 
                 <div className="grid justify-items-center">
                   <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
-                    aa
+                    R$ {card.moneyReturn}
                   </span>
                 </div>  
 
@@ -188,10 +242,9 @@ export default function Bet() {
             </div>
 
             <div className="flex items-end justify-between h-full w-full gap-2 px-4">
-                <button className="bg-[#057EFF] w-32 h-8 rounded-full flex items-center justify-center" onClick={() => setEditModalOpen(true)}><Edit className="w-4 h-4"/></button>
-                <button className="bg-[#057EFF] w-32 h-8 rounded-full flex items-center justify-center" onClick={() => setGameEditModalOpen(true)}><Plus className="w-4 h-4"/></button>
-                <button className="bg-[#18c964] w-32 h-8 rounded-full flex items-center justify-center"><Check className="w-4 h-4"/></button>
-                <button className="bg-[#f31260] w-32 h-8 rounded-full flex items-center justify-center"><Trash className="w-4 h-4"/></button>
+                <button className="bg-[#057EFF] w-2/4 h-10 rounded-full flex items-center justify-center rounded-md" onClick={() => setGameEditModalOpen(true)}><Plus className="w-4 h-4"/></button>
+                <button className="bg-[#18c964] w-1/4 h-10 rounded-full flex items-center justify-center rounded-md"><Check className="w-4 h-4"/></button>
+                <button className="bg-[#f31260] w-1/4 h-10 rounded-full flex items-center justify-center rounded-md"><Trash className="w-4 h-4"/></button>
             </div>
 
           </div>
@@ -205,78 +258,61 @@ export default function Bet() {
               ))}
             </div>
 
+            {card.games.map((game, index) => (
+
             <div style={{ alignItems: "center", justifyContent: "space-between",}} className="grid grid-cols-4 px-8">
             <div className="grid justify-items-center">
               <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
-                1
+                {index}
               </span>
             </div>
 
             <div className="grid justify-items-center">
               <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
-                3,20x
+                {game.gameOdd}
               </span>
             </div>
 
             <div className="grid justify-items-center">
               <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
-              R$ 30,00
+               R$ {game.gameEntry}
               </span>
             </div>
 
             <div className="grid justify-items-center">
               <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
-                R$ 96,00
+                R$ {game.gameReturn}
               </span>
             </div>
           </div>
+          ))}
           </ScrollShadow>
+
+          <Modal isOpen={gameModalOpen} onOpenChange={setGameEditModalOpen} className="bg-[#1b1b1b]">
+            <ModalContent>
+              {(onClose) => (
+                <>
+                  <ModalHeader className="flex flex-col gap-1 text-white">Add game</ModalHeader>
+                  <ModalBody className="flex flex-row">
+                    <Input className="w-full md:w-[48%]" label="Entry" labelPlacement="inside" type="number" onChange={(e) => setGameEntry(Number(e.target.value))} />
+                    <Input className="w-full md:w-[48%]" label="Odd" labelPlacement="inside" type="number" onChange={(e) => setGameOdd(Number(e.target.value))} />
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="danger" variant="light" onPress={onClose}>
+                      close
+                    </Button>
+                    <Button color="primary" onPress={() => addGame(index)}>
+                      Add
+                    </Button>
+                  </ModalFooter>
+                </>
+              )}
+            </ModalContent>
+          </Modal>
 
 
       </div>
       ))}
-
-      <Modal isOpen={editModalOpen} onOpenChange={setEditModalOpen} className="bg-[#1b1b1b]">
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1 text-white">Editar aposta</ModalHeader>
-              <ModalBody>
-                <Input className="w-full md:w-1/3" label="Jogos" labelPlacement="inside" type="number" onChange={(e) => setPoints(Number(e.target.value))} />
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary">
-                  Salvar
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-
-      <Modal isOpen={gameModalOpen} onOpenChange={setGameEditModalOpen} className="bg-[#1b1b1b]">
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1 text-white">Editar aposta</ModalHeader>
-              <ModalBody>
-                <Input className="w-full md:w-1/3" label="Odds" labelPlacement="inside" type="number" onChange={(e) => setPoints(Number(e.target.value))} />
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary">
-                  Salvar
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
 
     </div>
   )
