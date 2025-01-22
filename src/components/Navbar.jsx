@@ -1,3 +1,4 @@
+import { Accordion, AccordionItem } from "@nextui-org/react";
 import {
   User,
   User2,
@@ -48,7 +49,7 @@ export default function NavbarComponent() {
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`${isOpen ? "self-end" : "self-center"} mb-4 p-2 bg-gray-800 rounded-full text-white hover:bg-gray-700 transition-all duration-600`}
+        className={`${isOpen ? "self-end" : "self-center"} flex items-center justify-center mb-4 p-2 bg-gray-800 rounded-full text-white hover:bg-gray-700 transition-all duration-600`}
       >
         {isOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
       </button>
@@ -56,22 +57,20 @@ export default function NavbarComponent() {
       {/* Menu Items */}
       <div className="flex flex-col gap-4">
         {menuItems.map((item, index) => (
-          <li key={index} className="list-none">
-            <a
-              href={item.href}
-              className={`flex items-center ${
-                isOpen ? "gap-4" : "justify-center"
-              } px-4 py-3 rounded-2xl transition-colors ${
-                item.active
-                  ? "bg-gradient-to-b from-[#2384A1] via-[#057EFF] to-[#5100FF] text-white"
-                  : "text-gray-400 hover:bg-gray-700"
-              }`}
-              target={item.target}
-            >
-              {item.icon}
-              {isOpen && <span className="font-medium text-lg">{item.label}</span>}
-            </a>
-          </li>
+          <a
+            href={item.href}
+            className={`flex items-center ${
+              isOpen ? "gap-4" : "justify-center"
+            } px-4 py-3 rounded-2xl transition-colors ${
+              item.active
+                ? "bg-gradient-to-b from-[#2384A1] via-[#057EFF] to-[#5100FF] text-white"
+                : "text-gray-400 hover:bg-gray-700"
+            }`}
+            target={item.target}
+          >
+            {item.icon}
+            {isOpen && <span className="font-medium text-lg">{item.label}</span>}
+          </a>
         ))}
       </div>
     </aside>
