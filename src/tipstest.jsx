@@ -1,10 +1,10 @@
 import { Button } from "@nextui-org/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LZString from "lz-string";
 
 export default function TipsTest() {
-  const [playersStats, setPlayersStats] = useState([]);
   const [playersFinal, setPlayersFinal] = useState([]);
+  const [allPlayers, setAllPlayers] = useState([]);
   const [points, setPoints] = useState(0);
   const [assists, setAssists] = useState(1);
   const [rebounds, setRebounds] = useState(1);
@@ -70,6 +70,9 @@ const applyFilters = (filters) => {
         currentGamesWithoutCriteria: 0,
         last10Games: [],
         lastMatches: [],
+        filterPoints: points,
+        filterAssists: assists,
+        filterRebounds: rebounds
       };
     }
 
@@ -132,18 +135,30 @@ const applyFilters = (filters) => {
     (player) =>
       player.percentage > minPercentage &&
       player.percentage < maxPercentage &&
-      player.maxGamesWithoutCriteria >= InputmaxGamesWithoutCriteria
+      player.maxGamesWithoutCriteria <= InputmaxGamesWithoutCriteria
   );
 
   // Atualiza o estado com os jogadores filtrados
-  setPlayersFinal(filteredPlayers);
+
+  setAllPlayers((prevAllPlayers) => [...prevAllPlayers, filteredPlayers]);
 
   console.log("Resultados para filtros:", filters, filteredPlayers);
 };
 
+useEffect(() => {
+  console.log(allPlayers)
+}, [allPlayers])
+
   return (
-    <div className="bg-black w-full h-screen flex flex-col items-center justify-center space-y-4">
+    <div className="bg-black w-full h-full flex flex-col items-center justify-center space-y-4">
       <Button onPress={generatePossibilities}>Gerar Possibilidades</Button>
+      {allPlayers.map((playerList) => (
+        playerList.map((ply) => (
+          <span key={ply.name}>
+            {ply.name} - {ply.team} - / pontos: {ply.filterPoints} / assists: {ply.filterAssists} / rebounds: {ply.filterRebounds} / {ply.criteriaMet}/{ply.totalGames}, ({ply.percentage}%) / {ply.maxGamesWithoutCriteria}
+          </span>
+        ))
+      ))}
     </div>
   );
 }
