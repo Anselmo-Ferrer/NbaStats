@@ -13,7 +13,7 @@ const columns = [
   { label: "Last Matches", justifyItems: "justify-items-center", columnSpan: "col-span-3" },
 ];
 
-const PlayerStatsFilter = () => {
+const PlayerTest = () => {
 
   const [percentageMin, setPercentageMin] = useState()
   const [percentageMax, setPercentageMax] = useState()
@@ -29,6 +29,7 @@ const PlayerStatsFilter = () => {
   const aoMexerNome = (e) => {
     setPlayerName(e.target.value)
   }
+  
 
   const applyFilters = (pontos, assistencias, rebotes) => {
     const compressedData = localStorage.getItem('compressedGameData');
@@ -180,7 +181,7 @@ const PlayerStatsFilter = () => {
   };
 
   return (
-    <div className='py-10 flex gap-4'>
+    <div className='py-10 flex gap-4 z-30'>
       <div className='flex flex-col w-[20%] gap-4'>
         <div className='flex gap-2 items-center justify-center'>
           <Input label="Percentage min" labelPlacement="inside" type="number" value={percentageMin} onChange={(e) => setPercentageMin(Number(e.target.value))}/>
@@ -309,4 +310,4 @@ const PlayerStatsFilter = () => {
   );
 };
 
-export default PlayerStatsFilter;
+export default PlayerTest;

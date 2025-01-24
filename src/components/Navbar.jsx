@@ -7,6 +7,7 @@ import {
   Star,
   ChevronLeft,
   ChevronRight,
+  Search,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -15,6 +16,7 @@ export default function NavbarComponent() {
 
   const initialMenuItems = [
     { icon: <User className="w-6 h-6" />, label: "Players", active: false, href: "/players" },
+    { icon: <Search className="w-6 h-6" />, label: "Tips", active: false, href: "/tips" },
     { icon: <User2 className="w-6 h-6" />, label: "Teams", active: false, href: "/teams" },
     { icon: <Wallet className="w-6 h-6" />, label: "Bets", active: false, href: "/bet" },
     { icon: <PersonStanding className="w-6 h-6" />, label: "Standings", active: false, href: "/standings" },
