@@ -4,7 +4,7 @@ import LZString from "lz-string";
 
 export default function FetchAndStoreData() {
   const apiKeys = [
-    import.meta.env.VITE_API_KEY_1,
+    //import.meta.env.VITE_API_KEY_1,
     import.meta.env.VITE_API_KEY_2,
     import.meta.env.VITE_API_KEY_4,
     import.meta.env.VITE_API_KEY_5,
@@ -71,7 +71,7 @@ export default function FetchAndStoreData() {
             console.log(maxFalseGames)
 
           // Aguardar antes da próxima solicitação
-            await new Promise((resolve) => setTimeout(resolve, 250));
+            await new Promise((resolve) => setTimeout(resolve, 350));
           } else {
             if (maxFalseGames === 1) {
               break
