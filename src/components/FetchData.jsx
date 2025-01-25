@@ -15,7 +15,7 @@ export default function FetchAndStoreData() {
     //import.meta.env.VITE_API_KEY_12,
     //import.meta.env.VITE_API_KEY_13,
     import.meta.env.VITE_API_KEY_14,
-    import.meta.env.VITE_API_KEY_15,
+    //import.meta.env.VITE_API_KEY_15,
   ];
 
   const [error, setError] = useState(null);
