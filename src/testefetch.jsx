@@ -4,7 +4,7 @@ import LZString from "lz-string";
 export default function TesteFetch() {
 
   const fetchGameStats = async (gameId) => {
-    const apiKey = "89e8d18db2msh750cb1be8006c38p19c402jsne47214e05847"
+    const apiKey = "38672978a3mshb0e70ee4a14db29p110155jsnb9b1f54aa483"
     const url = `https://api-nba-v1.p.rapidapi.com/players/statistics?game=${gameId}`;
     const options = {
       method: "GET",
@@ -90,7 +90,7 @@ export default function TesteFetch() {
   return (
     <div>
       <Button onPress={handleButtonClick}>Testar</Button>
-      <Button onPress={fetchAndStoreData}>Resetar</Button>
+      <Button onPress={fetchAndStoreData}>Primeira</Button>
       <Button onPress={verDados}>Dados</Button>
       <Button onPress={verDados2}>Dados2</Button>
       <Button onPress={localStorageGroups}>Criar</Button>
