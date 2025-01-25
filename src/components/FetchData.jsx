@@ -4,7 +4,7 @@ import LZString from "lz-string";
 
 export default function FetchAndStoreData() {
   const apiKeys = [
-    //import.meta.env.VITE_API_KEY_1,
+    import.meta.env.VITE_API_KEY_1,
     import.meta.env.VITE_API_KEY_2,
     import.meta.env.VITE_API_KEY_4,
     import.meta.env.VITE_API_KEY_5,
