@@ -1,7 +1,7 @@
 import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/react";
 
-export default function Tips() {
+export default function TipsComponent() {
   return (
     <div className='p-10 flex w-full flex-col gap-8 z-50'>
 
