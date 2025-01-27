@@ -73,7 +73,7 @@ export default function FetchAndStoreData() {
           // Aguardar antes da próxima solicitação
             await new Promise((resolve) => setTimeout(resolve, 350));
           } else {
-            if (maxFalseGames === 1) {
+            if (maxFalseGames === 2) {
               break
             }
             maxFalseGames++

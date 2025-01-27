@@ -1,7 +1,8 @@
 import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ScrollShadow, useDisclosure } from "@nextui-org/react";
-import { Check, Edit, Plus, Trash, X } from "lucide-react";
+import { Check, Edit, Plus, Trash, X, XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import CardTest from "./cardtest";
+import LZString from "lz-string";
 
 export default function Bet() {
 
@@ -37,9 +38,26 @@ export default function Bet() {
   const [gameEntry, setGameEntry] = useState()
   const [gameOdd, setGameOdd] = useState()
 
+  const [localStorageData, setLocalStorageData] = useState([])
+
+  const carregarDados = () => {
+    const compressedData = localStorage.getItem('BetCards');
+    if (compressedData) {
+      const rawData = JSON.parse(LZString.decompress(compressedData));
+      setLocalStorageData(rawData)
+    }
+  }
+  
+  useEffect(() => {
+    carregarDados()
+  }, [])
 
   const criarCard = () => {
-
+    const compressedData = localStorage.getItem('BetCards');
+    const rawData = compressedData
+      ? JSON.parse(LZString.decompress(compressedData))
+      : [];
+  
     const card = {
       name: name,
       points: points,
@@ -51,11 +69,20 @@ export default function Bet() {
       moneySpent: 0,
       moneyReturn: 0,
       games: [],
-    }
+    };
+  
+    const dadosAtualizados = [...rawData, card];
+    const comprimir = LZString.compress(JSON.stringify(dadosAtualizados));
+    localStorage.setItem("BetCards", comprimir);
+    setCardsData(dadosAtualizados);
+    console.log("Card criado com sucesso!");
+  };
 
-    setCardsData((prevCardsData) => [...prevCardsData, card]);
-    console.log("card criado")
-
+  const salvarCard = () => {
+    const dados = [...cardsData]
+    console.log(dados)
+    const compressedData = LZString.compress(JSON.stringify(dados));
+    localStorage.setItem("BetCards", compressedData);
   }
 
   const addGame = (index) => {
@@ -64,49 +91,63 @@ export default function Bet() {
       gameOdd: gameOdd,
       gameReturn: (gameEntry * gameOdd).toFixed(2),
     };
-
-    // Cria uma cópia do estado atual de cardsData
-    const updatedCards = [...cardsData];
   
-    // Adiciona o jogo no array de games do card especificado
+    const compressedData = localStorage.getItem('BetCards');
+    const rawData = compressedData
+      ? JSON.parse(LZString.decompress(compressedData))
+      : [];
+  
+    const updatedCards = [...rawData];
     updatedCards[index].games.push(game);
-  
-    // Atualiza os valores relacionados no card
     updatedCards[index].totalGames = updatedCards[index].games.length;
-    updatedCards[index].avarageOdd = 
+    updatedCards[index].avarageOdd =
       updatedCards[index].games.reduce((sum, game) => sum + game.gameOdd, 0) / updatedCards[index].games.length;
     updatedCards[index].moneySpent += game.gameEntry;
-    updatedCards[index].moneyReturn = game.gameReturn;
-
+    updatedCards[index].moneyReturn =
+      updatedCards[index].games[updatedCards[index].games.length - 1].gameReturn
+  
     if (updatedCards[index].games.length > 1) {
       const currentIndex = updatedCards[index].games.length - 1;
       const currentEntry = updatedCards[index].games[currentIndex].gameEntry;
       const previousEntry = updatedCards[index].games[currentIndex - 1].gameEntry;
   
-      updatedCards[index].gale = (currentEntry / previousEntry).toFixed(2)
+      updatedCards[index].gale = (currentEntry / previousEntry).toFixed(2);
     } else {
-      // Caso não existam jogos suficientes, gale é 0 ou indefinido
-      updatedCards[index].gale = 0; 
+      updatedCards[index].gale = 0;
     }
   
-    // Atualiza o estado com a cópia modificada
+    const comprimir = LZString.compress(JSON.stringify(updatedCards));
+    localStorage.setItem("BetCards", comprimir);
     setCardsData(updatedCards);
+    console.log("Game adicionado com sucesso ao card:", updatedCards[index]);
+  };
+
+  const deleteCard = (index) => {
+    const compressedData = localStorage.getItem('BetCards');
+    const rawData = compressedData
+      ? JSON.parse(LZString.decompress(compressedData))
+      : [];
   
-    console.log("Game adicionado com sucesso", game);
+    const updatedCards = rawData.filter((_, i) => i !== index);
+    const comprimir = LZString.compress(JSON.stringify(updatedCards));
+    localStorage.setItem("BetCards", comprimir);
+    setLocalStorageData(updatedCards);
+    console.log("Card excluído com sucesso!");
   };
 
   useEffect(() => {
     console.log(cardsData)
-  }, [cardsData]) 
-
+  }, [cardsData])
 
   return (
     <div className="z-30 flex flex-col p-10 w-full gap-8">
       <div className="w-full flex items-end justify-between">
-        <CardTest label={"Total bets"} value={0}/>
-        <CardTest label={"Acertividade"} value={`80%`}/>
-        <CardTest label={"Money Spent"} value={`R$ 37,00`}/>
-        <CardTest label={"Money earned"} value={`R$ 37,00`}/>
+        <CardTest label={"Total bets"} value={localStorageData.length}/>
+        <CardTest label={"Greens"} value={0}/>
+        <CardTest label={"Reds"} value={0}/>
+        <CardTest label={"Acertividade"} value={0}/>
+        <CardTest label={"Money Spent"} value={localStorageData.reduce((acc, card) => acc + (card.moneySpent || 0), 0)}/>
+        <CardTest label={"Money earned"} value={0}/>
         <Button onPress={() => setAddModalOpen(true)} color="primary">Adicionar</Button>
       </div>
       <Modal isOpen={addModalOpen} onOpenChange={setAddModalOpen} className="bg-[#1b1b1b]">
@@ -135,13 +176,7 @@ export default function Bet() {
         </ModalContent>
       </Modal>
 
-
-
-
-
-
-
-      {cardsData.map((card, index) => (
+      {localStorageData.map((card, index) => (
       <div className="w-full flex">
         <div className=' w-[30%] mb-4 py-8 rounded-l-lg' style={{backgroundColor: "#057EFF", backdropFilter: "blur(20px)"}}>
 
@@ -163,23 +198,18 @@ export default function Bet() {
           </div>
 
           <div style={{ alignItems: "center", justifyContent: "space-between",}} className="grid grid-cols-3 px-8">
-            {/* Player Info */}
-
-              {/* Stats */}
               <div className="grid justify-items-center">
                 <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
                   {card.points}
                 </span>
               </div>
 
-              {/* Match Count */}
               <div className="grid justify-items-center">
                 <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
                   {card.assists}
                 </span>
               </div>
 
-              {/* Match Indicators */}
               <div className="grid justify-items-center">
                 <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
                   {card.rebounds}
@@ -188,10 +218,6 @@ export default function Bet() {
             
          </div>
 
-
-
-
-          
         </div>
 
           <div className='w-2/5 mb-4 py-8 flex flex-col justify-between ' style={{backgroundColor: "rgba(27, 27, 27, 0.6)", backdropFilter: "blur(20px)"}}>
@@ -205,9 +231,6 @@ export default function Bet() {
               </div>
 
               <div style={{ alignItems: "center", justifyContent: "space-between",}} className="grid grid-cols-5 px-8">
-              {/* Player Info */}
-
-                {/* Stats */}
                 <div className="grid justify-items-center">
                   <span style={{ color: "white", fontWeight: "600", fontSize: "1rem" }}>
                     {card.totalGames}
@@ -242,9 +265,10 @@ export default function Bet() {
             </div>
 
             <div className="flex items-end justify-between h-full w-full gap-2 px-4">
-                <button className="bg-[#057EFF] w-2/4 h-10 rounded-full flex items-center justify-center rounded-md" onClick={() => setGameEditModalOpen(true)}><Plus className="w-4 h-4"/></button>
+                <button className="bg-[#057EFF] w-1/4 h-10 rounded-full flex items-center justify-center rounded-md" onClick={() => setGameEditModalOpen(true)}><Plus className="w-4 h-4"/></button>
                 <button className="bg-[#18c964] w-1/4 h-10 rounded-full flex items-center justify-center rounded-md"><Check className="w-4 h-4"/></button>
-                <button className="bg-[#f31260] w-1/4 h-10 rounded-full flex items-center justify-center rounded-md"><Trash className="w-4 h-4"/></button>
+                <button className="bg-[#f31260] w-1/4 h-10 rounded-full flex items-center justify-center rounded-md"><XIcon className="w-4 h-4"/></button>
+                <button className="bg-transparent border-1 w-1/4 h-10 rounded-full flex items-center justify-center rounded-md" onClick={() => deleteCard(index)}><Trash className="w-4 h-4"/></button>
             </div>
 
           </div>
@@ -309,7 +333,6 @@ export default function Bet() {
               )}
             </ModalContent>
           </Modal>
-
 
       </div>
       ))}

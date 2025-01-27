@@ -1,5 +1,5 @@
 import { Input } from "@nextui-org/input";
-import { Button, ScrollShadow } from "@nextui-org/react";
+import { Button, Checkbox, ScrollShadow } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import LZString from "lz-string";import { StarFilledIcon } from "@radix-ui/react-icons";
 ;
@@ -25,26 +25,32 @@ export default function TipsComponent() {
   const [maxPercentage, setMaxPercentage] = useState(0);
   const [InputmaxGamesWithoutCriteria, setInputMaxGamesWithoutCriteria] = useState(0);
 
-
-  const generatePossibilities = () => {
+  const generatePossibilities = async () => {  
     const combinations = [];
-    for (let i = 0; i <= 0; i++) {
-      for (let j = 4; j <= 15; j++) {
+    for (let i = 5; i <= 10; i++) {
+      for (let j = 0; j <= 0; j++) {
         for (let k = 4; k <= 15; k++) {
           combinations.push({ points: i, assists: j, rebounds: k });
         }
       }
     }
-
-    // Itera sobre as combinações e chama `applyFilters` para cada uma
-    combinations.forEach((combination) => {
-      setPoints(combination.points);
-      setAssists(combination.assists);
-      setRebounds(combination.rebounds);
-      applyFilters(combination);
-    });
-
-    setPlayersFinal(combinations); // Apenas para depuração ou outros usos
+  
+    try {
+      // Use uma abordagem assíncrona para processamento
+      for (const combination of combinations) {
+        await new Promise((resolve) => {
+          setTimeout(() => {
+            setPoints(combination.points);
+            setAssists(combination.assists);
+            setRebounds(combination.rebounds);
+            applyFilters(combination);
+            resolve();
+          }, 0); // Simula um pequeno delay para evitar bloqueios
+        });
+      }
+    } catch (error) {
+      console.error("Erro durante a geração de possibilidades:", error);
+    }
   };
 
   // Função para aplicar os filtros
@@ -185,6 +191,9 @@ const renderGameResult = (result) => {
           <Input className='w-full md:w-1/2' label="Max" labelPlacement="inside" type="number"  onChange={(e) => setMaxPercentage(Number(e.target.value))}/>
           <Input className='w-full md:w-1/2' label="Games" labelPlacement="inside" type="number" onChange={(e) => setInputMaxGamesWithoutCriteria(Number(e.target.value))}/>
         </div>
+        <Checkbox>points</Checkbox>
+        <Checkbox>Assist</Checkbox>
+        <Checkbox>Rebounds</Checkbox>
           <Input className='w-full md:w-1/2' label="Jogador" labelPlacement="inside" type="text" />
         <Button className='bg-[#057EFF] h-[55px] w-full md:w-1/2' onPress={generatePossibilities}>
           Filtrar
@@ -197,7 +206,7 @@ const renderGameResult = (result) => {
       {allPlayers && allPlayers.length > 0 ? (
         allPlayers.reverse().map((playerList, index) => (
           playerList.map((player, idx) => (
-        <div key={index} className="mb-4 mt-4" style={{ backgroundColor: "rgba(27, 27, 27, 0.6)", backdropFilter: "blur(20px)", borderRadius: "12px", padding: "32px" }}>
+        <div key={idx} className="mb-4 mt-4" style={{ backgroundColor: "rgba(27, 27, 27, 0.6)", backdropFilter: "blur(20px)", borderRadius: "12px", padding: "32px" }}>
           {/* columns */}
           <div style={{ marginBottom: "20px" }} className="grid grid-cols-9">
             {columns.map((column, columnIndex) => (
